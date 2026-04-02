@@ -38,7 +38,7 @@ Validar carga estable por APPLOAD, comandos base y aislamiento de ruta activa.
 28. Ejecutar `UCHI_DRENAJE` (o `UCHI_CUNETAS`) y verificar `uchi_drainage.csv` con segmentos `long_*`/`trans_*`.
 29. Verificar archivos externos `templates/pe_generic.tpl` y `templates/pe_dg2018.tpl`.
 30. Ejecutar `UCHI_TEMPLATE` (Perú) y confirmar variables base de carreteras/redes/catastro.
-31. Ejecutar `UCHI_TEMPLATE_DG` y confirmar parámetros DG-2018 de carretera.
+31. Ejecutar `UCHI_TEMPLATE_DG` y confirmar parámetros DG-2018 de carretera (ver `docs/release/TEMPLATES_DG2018.md`).
 32. Ejecutar `UCHI_CATASTRO` y verificar `uchi_catastro.csv` con lotes.
 33. Ejecutar `UCHI_CATASTRO_RUR` y verificar `uchi_catastro_rural.csv` con `area_m2/area_ha`.
 34. Ejecutar `UCHI_SUBDIV` y verificar `uchi_subdivision.csv` (type `lot/lot_corner/road/aporte`), filtro por boundary irregular, frente mínimo y `uchi_subdivision_summary.csv` con cuadro de áreas.
