@@ -49,6 +49,16 @@ uchi_main : dialog {
       label = "Exportar reporte";
       is_default = false;
     }
+    : button {
+      key = "run_process";
+      label = "Proceso integral";
+      is_default = false;
+    }
+    : button {
+      key = "export_geojson";
+      label = "Exportar GeoJSON";
+      is_default = false;
+    }
     : spacer {}
     ok_cancel;
   }

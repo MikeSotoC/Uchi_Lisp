@@ -31,6 +31,12 @@
     ((= action "report")
       (C:UCHI_REPORTE)
     )
+    ((= action "process")
+      (C:UCHI_PROCESAR)
+    )
+    ((= action "geojson")
+      (C:UCHI_EXPORT_GEOJSON)
+    )
     (T
       (uchi:log "UI cancelada o no disponible.")
     )
@@ -75,6 +81,14 @@
 
 (defun C:UCHI_RPT ()
   (C:UCHI_REPORTE)
+)
+
+(defun C:UCHI_PROCESO ()
+  (C:UCHI_PROCESAR)
+)
+
+(defun C:UCHI_GEOJSON ()
+  (C:UCHI_EXPORT_GEOJSON)
 )
 
 (defun C:TOPO_BASE ()
