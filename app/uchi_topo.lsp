@@ -13,6 +13,7 @@
 )
 
 (setq *uchi-points* nil)
+(setq *uchi-breaklines* nil)
 
 (defun uchi:project-get (k) (cdr (assoc k *uchi-project*)))
 
@@ -31,10 +32,12 @@
 
 (defun uchi:project-file-path () (strcat (uchi:launcher-dir-safe) "/uchi_project.dat"))
 (defun uchi:points-file-path () (strcat (uchi:launcher-dir-safe) "/uchi_points.dat"))
+(defun uchi:breaklines-file-path () (strcat (uchi:launcher-dir-safe) "/uchi_breaklines.dat"))
 
 (defun uchi:project-save (/ ok)
   (setq ok (uchi:write-text (uchi:project-file-path) (vl-princ-to-string *uchi-project*)))
   (if ok (uchi:write-text (uchi:points-file-path) (vl-princ-to-string *uchi-points*)))
+  (if ok (uchi:write-text (uchi:breaklines-file-path) (vl-princ-to-string *uchi-breaklines*)))
   (if ok
     (uchi:log (strcat "Proyecto guardado: " (uchi:project-file-path)))
     (uchi:log "ERROR no se pudo guardar proyecto.")
@@ -67,10 +70,77 @@
       )
     )
   )
+  (if (findfile (uchi:breaklines-file-path))
+    (progn
+      (setq fp (open (uchi:breaklines-file-path) "r"))
+      (if fp
+        (progn
+          (setq data (read fp))
+          (close fp)
+          (if (listp data) (setq *uchi-breaklines* data))
+        )
+      )
+    )
+  )
   (if *uchi-project*
     (uchi:log (strcat "Proyecto cargado: " (uchi:project-get "name")))
   )
   T
+)
+
+(defun uchi:point-by-id (pid / out p)
+  (setq out nil)
+  (foreach p *uchi-points*
+    (if (= (car p) pid) (setq out p))
+  )
+  out
+)
+
+(defun uchi:csv-row->breakline (cols / p1 p2 typ)
+  (if (>= (length cols) 2)
+    (progn
+      (setq p1 (car cols))
+      (setq p2 (cadr cols))
+      (setq typ (if (>= (length cols) 3) (strcase (nth 2 cols)) "HARD"))
+      (if (and p1 p2 (/= p1 "") (/= p2 "") (/= p1 p2))
+        (list p1 p2 typ)
+        nil
+      )
+    )
+    nil
+  )
+)
+
+(defun uchi:breakline-key (bl / a b)
+  (setq a (car bl) b (cadr bl))
+  (if (< (vl-string-compare a b) 0)
+    (strcat a "|" b)
+    (strcat b "|" a)
+  )
+)
+
+(defun uchi:import-breaklines-csv (path / lines line cols seen valid invalid out bl k)
+  (setq lines (uchi:read-lines path))
+  (setq seen nil valid 0 invalid 0 out nil)
+  (foreach line lines
+    (setq cols (uchi:split-csv-line line))
+    (setq bl (uchi:csv-row->breakline cols))
+    (if (and bl (uchi:point-by-id (car bl)) (uchi:point-by-id (cadr bl)))
+      (progn
+        (setq k (uchi:breakline-key bl))
+        (if (assoc k seen)
+          (setq invalid (+ invalid 1))
+          (progn
+            (setq seen (cons (cons k T) seen))
+            (setq valid (+ valid 1))
+            (setq out (append out (list bl)))
+          )
+        )
+      )
+      (setq invalid (+ invalid 1))
+    )
+  )
+  (list (cons "valid" valid) (cons "invalid" invalid) (cons "breaklines" out))
 )
 
 (defun uchi:ensure-project (/ name)
@@ -182,6 +252,28 @@
       (uchi:apply-import-summary f summary)
     )
     (uchi:log "No hay archivo de puntos previo para validar.")
+  )
+  (princ)
+)
+
+(defun C:UCHI_BREAKLINES_IMPORT (/ f summary)
+  (uchi:topo-init)
+  (if (not *uchi-points*)
+    (uchi:log "Breaklines: primero importe puntos.")
+    (progn
+      (setq f (getfiled "Seleccione CSV de breaklines (p1,p2,tipo)" "" "csv" 16))
+      (if f
+        (progn
+          (setq summary (uchi:import-breaklines-csv f))
+          (setq *uchi-breaklines* (cdr (assoc "breaklines" summary)))
+          (uchi:project-set "breaklines_count" (cdr (assoc "valid" summary)))
+          (uchi:project-save)
+          (uchi:log (strcat "Breaklines importadas=" (itoa (cdr (assoc "valid" summary)))
+                            ", inválidas=" (itoa (cdr (assoc "invalid" summary)))))
+        )
+        (uchi:log "Importación de breaklines cancelada.")
+      )
+    )
   )
   (princ)
 )

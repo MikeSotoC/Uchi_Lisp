@@ -147,6 +147,10 @@
   (C:UCHI_BOUNDARY)
 )
 
+(defun C:UCHI_BREAKLINES ()
+  (C:UCHI_BREAKLINES_IMPORT)
+)
+
 (defun C:TOPO_BASE ()
   ;; Alias legacy.
   (C:UCHI_TOPO)
