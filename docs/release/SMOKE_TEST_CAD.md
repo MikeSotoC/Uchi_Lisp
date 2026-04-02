@@ -39,7 +39,7 @@ Validar carga estable por APPLOAD, comandos base y aislamiento de ruta activa.
 29. Ejecutar `UCHI_TEMPLATE` (Perú) y confirmar variables base de carreteras/redes/catastro.
 30. Ejecutar `UCHI_CATASTRO` y verificar `uchi_catastro.csv` con lotes.
 31. Ejecutar `UCHI_CATASTRO_RUR` y verificar `uchi_catastro_rural.csv` con `area_m2/area_ha`.
-32. Ejecutar `UCHI_SUBDIV` y verificar `uchi_subdivision.csv` (row/col/area) + geometría en capa `UCHI_SUBDIV`.
+32. Ejecutar `UCHI_SUBDIV` y verificar `uchi_subdivision.csv` (type lot/road, row/col/area), filtro por boundary y geometría en capas `UCHI_SUBDIV`/`UCHI_ROAD`.
 33. Ejecutar `UCHI_MODULOS` y validar inventario por dominios en logs.
 34. Ejecutar `UCHI_REDES_PE` y verificar `uchi_redes.csv` con `AGUA/DESAGUE`, `BZ` y accesorios.
 35. Ejecutar `UCHI_ROAD` y validar dibujo de secciones tipo en capa `UCHI_ROAD`.

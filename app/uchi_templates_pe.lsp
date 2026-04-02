@@ -23,6 +23,10 @@
   (setenv "UCHI_CFG_RURAL_FRONT" "60")
   (setenv "UCHI_CFG_RURAL_DEPTH" "200")
   (setenv "UCHI_CFG_RURAL_USE" "AGRICOLA")
+  (setenv "UCHI_CFG_SUBDIV_COLS" "6")
+  (setenv "UCHI_CFG_SUBDIV_ROWS" "6")
+  (setenv "UCHI_CFG_SUBDIV_ROAD_EVERY" "3")
+  (setenv "UCHI_CFG_SUBDIV_MIN_AREA" "80")
   (uchi:log "Template Perú aplicado (topo + carreteras + saneamiento + catastro).")
 )
 
