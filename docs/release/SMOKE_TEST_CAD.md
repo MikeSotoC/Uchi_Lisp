@@ -5,11 +5,11 @@ Validar carga estable por APPLOAD, comandos base y aislamiento de ruta activa.
 
 ## Precondiciones
 - Dos instalaciones de prueba (A nueva, B vieja) para validar no-mezcla.
-- APPLOAD apuntando explícitamente a `app/uchi_bootstrap.lsp` de la instalación A.
+- APPLOAD apuntando explícitamente a `main.lsp` de la instalación A.
 
 ## Pasos
 1. Abrir CAD limpio.
-2. Ejecutar APPLOAD sobre `.../A/app/uchi_bootstrap.lsp`.
+2. Ejecutar APPLOAD sobre `.../A/main.lsp`.
 3. Revisar consola: debe salir `[UCHI] Ruta activa: .../A/app`.
 4. Ejecutar comando `UCHI`.
 5. Confirmar diálogo con título **UCHI** (sin branding legacy).
