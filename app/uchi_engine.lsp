@@ -1,6 +1,17 @@
-;;; UCHI Engine - avances grandes integrados
+;;; UCHI Engine - triangulación y volúmenes mejorados
 
 (setq *uchi-mesh* nil)
+
+(defun uchi:sort-points-xy (pts)
+  (vl-sort pts
+    '(lambda (a b)
+       (if (= (cadr a) (cadr b))
+         (< (caddr a) (caddr b))
+         (< (cadr a) (cadr b))
+       )
+     )
+  )
+)
 
 (defun uchi:tri-area2d (a b c / x1 y1 x2 y2 x3 y3)
   (setq x1 (cadr a) y1 (caddr a)
@@ -9,26 +20,27 @@
   (/ (abs (- (* (- x2 x1) (- y3 y1)) (* (- x3 x1) (- y2 y1)))) 2.0)
 )
 
-(defun uchi:build-mesh-fan (/ p0 rest tri mesh)
-  (setq mesh nil)
-  (if (> (length *uchi-points*) 2)
-    (progn
-      (setq p0 (car *uchi-points*))
-      (setq rest (cdr *uchi-points*))
-      (while (> (length rest) 1)
-        (setq tri (list p0 (car rest) (cadr rest)))
-        (setq mesh (append mesh (list tri)))
-        (setq rest (cdr rest))
-      )
+(defun uchi:tri-avg-z (a b c)
+  (/ (+ (nth 3 a) (nth 3 b) (nth 3 c)) 3.0)
+)
+
+(defun uchi:build-mesh-strip (/ pts i a b c mesh)
+  (setq pts (uchi:sort-points-xy *uchi-points*))
+  (setq mesh nil i 0)
+  (while (< (+ i 2) (length pts))
+    (setq a (nth i pts) b (nth (+ i 1) pts) c (nth (+ i 2) pts))
+    (if (> (uchi:tri-area2d a b c) 0.00001)
+      (setq mesh (append mesh (list (list a b c))))
     )
+    (setq i (+ i 1))
   )
   mesh
 )
 
-(defun uchi:mesh-area-total (mesh / a t)
+(defun uchi:mesh-area-total (mesh / t tri)
   (setq t 0.0)
-  (foreach a mesh
-    (setq t (+ t (uchi:tri-area2d (car a) (cadr a) (caddr a))))
+  (foreach tri mesh
+    (setq t (+ t (uchi:tri-area2d (car tri) (cadr tri) (caddr tri))))
   )
   t
 )
@@ -37,13 +49,14 @@
   (uchi:to-real (or (getenv "UCHI_CFG_DESIGN_Z") 0.0))
 )
 
-(defun uchi:volume-cut-fill (/ dz p cut fill z)
-  (setq cut 0.0 fill 0.0 dz (uchi:design-z))
-  (foreach p *uchi-points*
-    (setq z (nth 3 p))
-    (if (> z dz)
-      (setq cut (+ cut (- z dz)))
-      (setq fill (+ fill (- dz z)))
+(defun uchi:volume-cut-fill-mesh (mesh / dz cut fill tri area delta)
+  (setq dz (uchi:design-z) cut 0.0 fill 0.0)
+  (foreach tri mesh
+    (setq area (uchi:tri-area2d (car tri) (cadr tri) (caddr tri)))
+    (setq delta (- (uchi:tri-avg-z (car tri) (cadr tri) (caddr tri)) dz))
+    (if (> delta 0)
+      (setq cut (+ cut (* area delta)))
+      (setq fill (+ fill (* area (- delta))))
     )
   )
   (list (cons "cut" cut) (cons "fill" fill))
@@ -72,10 +85,7 @@
       (uchi:log (strcat "GeoJSON exportado: " path))
       path
     )
-    (progn
-      (uchi:log "ERROR al exportar GeoJSON.")
-      nil
-    )
+    (progn (uchi:log "ERROR al exportar GeoJSON.") nil)
   )
 )
 
@@ -90,10 +100,11 @@
   (if (> (length *uchi-points*) 2)
     (progn
       (C:UCHI_ESTILOS)
-      (setq mesh (uchi:build-mesh-fan))
+      (setq mesh (uchi:build-mesh-strip))
       (setq *uchi-mesh* mesh)
       (setq area (uchi:mesh-area-total mesh))
-      (setq vol (uchi:volume-cut-fill))
+      (setq vol (uchi:volume-cut-fill-mesh mesh))
+
       (uchi:project-set "mesh_triangles" (length mesh))
       (uchi:project-set "mesh_area" area)
       (uchi:project-set "cut" (cdr (assoc "cut" vol)))
