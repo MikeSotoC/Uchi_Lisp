@@ -1,0 +1,25 @@
+uchi_main : dialog {
+  label = "UCHI";
+  : column {
+    : text {
+      key = "title_txt";
+      label = "UCHI";
+    }
+    : text {
+      key = "subtitle_txt";
+      label = "Topografía productiva";
+    }
+    : button {
+      key = "run_flujo";
+      label = "Ejecutar flujo base";
+      is_default = false;
+    }
+    : button {
+      key = "import_pts";
+      label = "Importar puntos CSV";
+      is_default = false;
+    }
+    : spacer {}
+    ok_cancel;
+  }
+}
