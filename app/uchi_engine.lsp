@@ -89,6 +89,7 @@
   (uchi:topo-init)
   (if (> (length *uchi-points*) 2)
     (progn
+      (C:UCHI_ESTILOS)
       (setq mesh (uchi:build-mesh-fan))
       (setq *uchi-mesh* mesh)
       (setq area (uchi:mesh-area-total mesh))
@@ -107,6 +108,7 @@
       (C:UCHI_VOLUMEN)
       (C:UCHI_QC)
       (C:UCHI_REPORTE)
+      (C:UCHI_EXPORT_LANDXML)
 
       (uchi:log (strcat "Proceso integral OK. Triángulos=" (itoa (length mesh))
                         ", Área=" (rtos area 2 2)

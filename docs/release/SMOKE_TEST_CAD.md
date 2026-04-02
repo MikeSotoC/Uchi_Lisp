@@ -28,11 +28,13 @@ Validar carga estable por APPLOAD, comandos base y aislamiento de ruta activa.
 18. Ejecutar `UCHI_VOLUMEN` y verificar `uchi_volume.csv`.
 19. Ejecutar `UCHI_QC` y validar métricas (dup_rate/inv_rate/tri/area).
 20. Ejecutar `UCHI_RELEASE_GO` y verificar mensaje GO/NO-GO.
-21. Ejecutar `UCHI_DIAG` y validar launcher/appdir en logs.
-22. Revisar logs `[UCHI] Flujo topográfico base iniciado/completado`.
-23. Forzar fallback: mover temporalmente módulos de A y dejar `UCHI_APP_DIR` a B.
-24. Verificar que el sistema anuncia fallback usado y ruta final activa.
-25. Restaurar módulos y repetir APPLOAD en A.
+21. Ejecutar `UCHI_ESTILOS` y validar capas UCHI creadas.
+22. Ejecutar `UCHI_EXPORT_LANDXML` y verificar `uchi_surface.xml`.
+23. Ejecutar `UCHI_DIAG` y validar launcher/appdir en logs.
+24. Revisar logs `[UCHI] Flujo topográfico base iniciado/completado`.
+25. Forzar fallback: mover temporalmente módulos de A y dejar `UCHI_APP_DIR` a B.
+26. Verificar que el sistema anuncia fallback usado y ruta final activa.
+27. Restaurar módulos y repetir APPLOAD en A.
 
 ## Criterio GO
 - No hay mezcla de `app/` entre instalaciones.

@@ -79,6 +79,16 @@ uchi_main : dialog {
       label = "Release GO/NO-GO";
       is_default = false;
     }
+    : button {
+      key = "run_styles";
+      label = "Aplicar estilos";
+      is_default = false;
+    }
+    : button {
+      key = "export_landxml";
+      label = "Exportar LandXML";
+      is_default = false;
+    }
     : spacer {}
     ok_cancel;
   }

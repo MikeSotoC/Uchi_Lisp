@@ -49,6 +49,12 @@
     ((= action "release")
       (C:UCHI_RELEASE_GO)
     )
+    ((= action "styles")
+      (C:UCHI_ESTILOS)
+    )
+    ((= action "landxml")
+      (C:UCHI_EXPORT_LANDXML)
+    )
     (T
       (uchi:log "UI cancelada o no disponible.")
     )
@@ -117,6 +123,14 @@
 
 (defun C:UCHI_GO ()
   (C:UCHI_RELEASE_GO)
+)
+
+(defun C:UCHI_STYLES ()
+  (C:UCHI_ESTILOS)
+)
+
+(defun C:UCHI_LXML ()
+  (C:UCHI_EXPORT_LANDXML)
 )
 
 (defun C:TOPO_BASE ()

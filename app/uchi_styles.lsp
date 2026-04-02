@@ -1,0 +1,21 @@
+;;; UCHI Styles routines
+
+(setq *uchi-style-layers*
+  (list
+    (list "UCHI_POINTS" 3)
+    (list "UCHI_SURFACE" 2)
+    (list "UCHI_PROFILE" 4)
+    (list "UCHI_CURVES" 5)
+    (list "UCHI_SECTIONS" 6)
+  )
+)
+
+(defun C:UCHI_ESTILOS (/ l)
+  (foreach l *uchi-style-layers*
+    (uchi:ensure-layer (car l) (cadr l))
+  )
+  (uchi:log "Estilos/capas UCHI aplicados.")
+  (princ)
+)
+
+(princ)

@@ -22,6 +22,7 @@
       "Longitud alineamiento: " (rtos (uchi:to-real (uchi:project-get "alignment_length")) 2 2) "\n"
       "Archivo alineamiento: uchi_alignment.csv\n"
       "Archivo volumen: uchi_volume.csv\n"
+      "Archivo LandXML: uchi_surface.xml\n"
       "QC OK: " (itoa (atoi (vl-princ-to-string (uchi:project-get "qc_ok")))) "\n"
       "QC dup_rate: " (rtos (uchi:to-real (uchi:project-get "qc_dup_rate")) 2 3) "\n"
       "QC inv_rate: " (rtos (uchi:to-real (uchi:project-get "qc_inv_rate")) 2 3) "\n"
