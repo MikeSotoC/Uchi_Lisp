@@ -18,7 +18,7 @@
 2. **Superficie**: TIN ahora considera breaklines hard importables y validación de cruce de segmentos; falta robustecer con límites complejos (huecos/islas), algoritmo Delaunay completo y suavizado avanzado.
 3. **Curvas**: ahora se generan por intersección de niveles sobre TIN con encadenado y suavizado base; falta robustecer topología compleja y etiquetado avanzado de producción.
 4. **Perfiles y secciones**: ya incluyen plantilla, escalas H/V, rasante por offset, bandas técnicas, offset L/R y presets normativos base (MOP/MTC/CUSTOM); falta catálogo completo de estilos por cliente.
-5. **Persistencia**: migrar de `.dat` a `.uchi.json` con versionado de esquema.
+5. **Persistencia**: ahora se genera snapshot `.uchi.json` versionado (schema 1.0.0) en paralelo a `.dat`; falta carga directa desde JSON y migrador bidireccional completo.
 6. **QA CAD real**: matriz por versión de AutoCAD y ZWCAD con evidencias.
 7. **Telemetría soporte**: log a archivo con rotación (además de consola `[UCHI]`).
 8. **Migrador legacy**: asistente para mapear configuraciones antiguas a esquema UCHI.

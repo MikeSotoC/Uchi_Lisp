@@ -38,6 +38,7 @@
   (setq ok (uchi:write-text (uchi:project-file-path) (vl-princ-to-string *uchi-project*)))
   (if ok (uchi:write-text (uchi:points-file-path) (vl-princ-to-string *uchi-points*)))
   (if ok (uchi:write-text (uchi:breaklines-file-path) (vl-princ-to-string *uchi-breaklines*)))
+  (if (and ok (fboundp 'uchi:persist-save-json)) (uchi:persist-save-json))
   (if ok
     (uchi:log (strcat "Proyecto guardado: " (uchi:project-file-path)))
     (uchi:log "ERROR no se pudo guardar proyecto.")

@@ -1,6 +1,6 @@
 # UCHI — Reporte de Gate de Release
 
-Fecha: 2026-04-02 06:43:17 UTC
+Fecha: 2026-04-02 06:52:14 UTC
 
 ## Contexto
 Este gate prioriza estabilidad de producción y bloquea release cuando faltan artefactos críticos.
@@ -78,8 +78,8 @@ Resultado: PASS
 ./docs/release/SMOKE_TEST_CAD.md:4:Validar carga estable por APPLOAD, comandos base y aislamiento de ruta activa.
 ./docs/release/SMOKE_TEST_CAD.md:8:- APPLOAD apuntando explícitamente a `main.lsp` de la instalación A.
 ./docs/release/SMOKE_TEST_CAD.md:12:2. Ejecutar APPLOAD sobre `.../A/main.lsp`.
-./docs/release/SMOKE_TEST_CAD.md:41:31. Restaurar módulos y repetir APPLOAD en A.
-./docs/release/SMOKE_TEST_CAD.md:44:- No hay mezcla de `app/` entre instalaciones.
+./docs/release/SMOKE_TEST_CAD.md:42:32. Restaurar módulos y repetir APPLOAD en A.
+./docs/release/SMOKE_TEST_CAD.md:45:- No hay mezcla de `app/` entre instalaciones.
 ./main.lsp:2:;;; Cargar este archivo por APPLOAD (fuera de app/).
 ./main.lsp:7:(setq *uchi-launcher-name* "main.lsp")
 ./main.lsp:97:  ;; 1) app/ relativo al launcher cargado por APPLOAD.

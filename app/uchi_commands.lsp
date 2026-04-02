@@ -155,6 +155,10 @@
   (C:UCHI_PERFIL_PRESET)
 )
 
+(defun C:UCHI_JSON ()
+  (C:UCHI_SAVE_JSON)
+)
+
 (defun C:TOPO_BASE ()
   ;; Alias legacy.
   (C:UCHI_TOPO)
