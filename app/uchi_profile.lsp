@@ -12,6 +12,7 @@
 (defun uchi:profile-v-scale () (max 0.0001 (uchi:cfg-real "UCHI_CFG_PROFILE_VSCALE" 10.0)))
 (defun uchi:profile-pk-step () (uchi:cfg-int "UCHI_CFG_PROFILE_PK_STEP" 20))
 (defun uchi:profile-grid-z-step () (max 0.1 (uchi:cfg-real "UCHI_CFG_PROFILE_GRID_Z" 1.0)))
+(defun uchi:profile-rasante-offset () (uchi:cfg-real "UCHI_CFG_PROFILE_RASANTE_OFFSET" 0.0))
 
 (defun uchi:profile-length (/ prev p len)
   (setq len 0.0 prev nil)
@@ -104,7 +105,25 @@
   )
 )
 
-(defun C:UCHI_PERFIL (/ l pts hs vs zmin zmax stp sta pxy)
+(defun uchi:profile-offset-polyline (pts zoff / out p)
+  (setq out nil)
+  (foreach p pts
+    (setq out (append out (list (list (car p) (+ (cadr p) zoff)))))
+  )
+  out
+)
+
+(defun uchi:profile-tech-band (len hs vs zoff / y)
+  (setq y -3.2)
+  (uchi:draw-line (list 0.0 y 0.0) (list (/ len hs) y 0.0) "UCHI_PROFILE")
+  (uchi:draw-text (list 0.0 (- y 1.0) 0.0) 0.8
+                  (strcat "BANDA TECNICA | Escala H=" (rtos hs 2 2)
+                          " | Escala V=" (rtos vs 2 2)
+                          " | Rasante offset=" (rtos zoff 2 2))
+                  "UCHI_PROFILE")
+)
+
+(defun C:UCHI_PERFIL (/ l pts hs vs zmin zmax stp sta pxy zoff pdes)
   (uchi:topo-init)
   (if (> (length *uchi-points*) 1)
     (progn
@@ -112,6 +131,7 @@
       (setq hs (uchi:profile-h-scale) vs (uchi:profile-v-scale))
       (setq zmin (uchi:to-real (uchi:project-get "z_min")))
       (setq zmax (uchi:to-real (uchi:project-get "z_max")))
+      (setq zoff (uchi:profile-rasante-offset))
       (if (>= zmin zmax) (setq zmax (+ zmin 1.0)))
 
       (uchi:profile-template l zmin zmax hs vs)
@@ -121,6 +141,8 @@
         (setq pxy (append pxy (list (list (/ (car p) hs) (* (- (cadr p) zmin) vs)))))
       )
       (uchi:draw-polyline-2d pxy "UCHI_PROFILE")
+      (setq pdes (uchi:profile-offset-polyline pxy (* zoff vs)))
+      (uchi:draw-polyline-2d pdes "UCHI_PROFILE_DESIGN")
 
       (setq stp (uchi:profile-pk-step))
       (setq sta (uchi:profile-stations stp))
@@ -130,8 +152,10 @@
                         (strcat "PK " (rtos (car p) 2 0) " / " (rtos (cadr p) 2 2))
                         "UCHI_PROFILE")
       )
+      (uchi:profile-tech-band l hs vs zoff)
       (uchi:project-set "profile_hscale" hs)
       (uchi:project-set "profile_vscale" vs)
+      (uchi:project-set "profile_rasante_offset" zoff)
       (uchi:project-save)
       (uchi:log (strcat "Perfil avanzado: longitud=" (rtos l 2 2) " m, H=" (rtos hs 2 2) ", V=" (rtos vs 2 2)))
     )

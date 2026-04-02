@@ -5,8 +5,9 @@
 (defun uchi:section-width () (max 5.0 (uchi:to-real (or (getenv "UCHI_CFG_SECTION_WIDTH") 20.0))))
 (defun uchi:section-height () (max 2.0 (uchi:to-real (or (getenv "UCHI_CFG_SECTION_HEIGHT") 8.0))))
 (defun uchi:section-columns () (max 1 (atoi (vl-princ-to-string (or (getenv "UCHI_CFG_SECTION_COLS") 4)))))
+(defun uchi:section-offset () (max 0.5 (uchi:to-real (or (getenv "UCHI_CFG_SECTION_OFFSET") 3.0))))
 
-(defun uchi:draw-section-template (ox oy w h title)
+(defun uchi:draw-section-template (ox oy w h title off)
   (uchi:draw-polyline-2d
     (list (list ox oy)
           (list (+ ox w) oy)
@@ -16,12 +17,18 @@
     "UCHI_SECTIONS")
   (uchi:draw-line (list (+ ox (/ w 2.0)) oy 0.0) (list (+ ox (/ w 2.0)) (+ oy h) 0.0) "UCHI_SECTIONS")
   (uchi:draw-line (list ox (+ oy (/ h 2.0)) 0.0) (list (+ ox w) (+ oy (/ h 2.0)) 0.0) "UCHI_SECTIONS")
+  (uchi:draw-line (list (+ ox (/ w 2.0) off) oy 0.0) (list (+ ox (/ w 2.0) off) (+ oy h) 0.0) "UCHI_SECTIONS")
+  (uchi:draw-line (list (+ ox (/ w 2.0) (- off)) oy 0.0) (list (+ ox (/ w 2.0) (- off)) (+ oy h) 0.0) "UCHI_SECTIONS")
   (if (fboundp 'uchi:draw-text)
-    (uchi:draw-text (list (+ ox 0.4) (+ oy h 0.4) 0.0) 0.8 title "UCHI_SECTIONS")
+    (progn
+      (uchi:draw-text (list (+ ox 0.4) (+ oy h 0.4) 0.0) 0.8 title "UCHI_SECTIONS")
+      (uchi:draw-text (list (+ ox (/ w 2.0) off) (- oy 0.9) 0.0) 0.7 (strcat "R+" (rtos off 2 1)) "UCHI_SECTIONS")
+      (uchi:draw-text (list (+ ox (/ w 2.0) (- off)) (- oy 0.9) 0.0) 0.7 (strcat "L-" (rtos off 2 1)) "UCHI_SECTIONS")
+    )
   )
 )
 
-(defun C:UCHI_SECCIONES (/ l i n idx cols w h row col ox oy st p)
+(defun C:UCHI_SECCIONES (/ l i n idx cols w h row col ox oy st p off)
   (uchi:topo-init)
   (if (uchi:sections-ready-p)
     (progn
@@ -31,6 +38,7 @@
       (setq cols (uchi:section-columns))
       (setq w (uchi:section-width))
       (setq h (uchi:section-height))
+      (setq off (uchi:section-offset))
       (setq st (uchi:profile-stations i))
       (setq idx 0)
       (repeat n
@@ -41,11 +49,13 @@
         (setq p (if (< idx (length st)) (nth idx st) (list (* idx i) 0.0)))
         (uchi:draw-section-template
           ox oy w h
-          (strcat "PK " (rtos (car p) 2 0) " / Cota " (rtos (cadr p) 2 2)))
+          (strcat "PK " (rtos (car p) 2 0) " / Cota " (rtos (cadr p) 2 2))
+          off)
         (setq idx (+ idx 1))
       )
       (uchi:project-set "sections_interval" i)
       (uchi:project-set "sections_count" n)
+      (uchi:project-set "sections_offset" off)
       (uchi:project-save)
       (uchi:log (strcat "Secciones avanzadas: " (itoa n) " plantillas, intervalo=" (itoa i) " m, cols=" (itoa cols)))
     )

@@ -17,7 +17,7 @@
 1. **Puntos**: reglas avanzadas extra (códigos, tolerancias, filtros por capa) y reporte exportable.
 2. **Superficie**: TIN ahora considera breaklines hard importables y validación de cruce de segmentos; falta robustecer con límites complejos (huecos/islas), algoritmo Delaunay completo y suavizado avanzado.
 3. **Curvas**: ahora se generan por intersección de niveles sobre TIN con encadenado y suavizado base; falta robustecer topología compleja y etiquetado avanzado de producción.
-4. **Perfiles y secciones**: ya incluyen plantilla, escalas H/V y anotación automática PK/cota base; falta enriquecer simbología de obra (rasante, offsets, bandas técnicas).
+4. **Perfiles y secciones**: ya incluyen plantilla, escalas H/V, rasante por offset, bandas técnicas y offset L/R en secciones; falta completar bandas normativas y estilos de presentación por cliente.
 5. **Persistencia**: migrar de `.dat` a `.uchi.json` con versionado de esquema.
 6. **QA CAD real**: matriz por versión de AutoCAD y ZWCAD con evidencias.
 7. **Telemetría soporte**: log a archivo con rotación (además de consola `[UCHI]`).
