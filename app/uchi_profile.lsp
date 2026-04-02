@@ -1,0 +1,143 @@
+;;; UCHI Profile routines
+
+(defun uchi:cfg-real (k d)
+  (uchi:to-real (or (getenv k) d))
+)
+
+(defun uchi:cfg-int (k d)
+  (max 1 (atoi (vl-princ-to-string (or (getenv k) d))))
+)
+
+(defun uchi:profile-h-scale () (max 0.0001 (uchi:cfg-real "UCHI_CFG_PROFILE_HSCALE" 1.0)))
+(defun uchi:profile-v-scale () (max 0.0001 (uchi:cfg-real "UCHI_CFG_PROFILE_VSCALE" 10.0)))
+(defun uchi:profile-pk-step () (uchi:cfg-int "UCHI_CFG_PROFILE_PK_STEP" 20))
+(defun uchi:profile-grid-z-step () (max 0.1 (uchi:cfg-real "UCHI_CFG_PROFILE_GRID_Z" 1.0)))
+
+(defun uchi:profile-length (/ prev p len)
+  (setq len 0.0 prev nil)
+  (foreach p *uchi-points*
+    (if prev (setq len (+ len (uchi:point-distance2d prev p))))
+    (setq prev p)
+  )
+  len
+)
+
+(defun uchi:profile-polyline-points (/ prev p acc x)
+  (setq prev nil acc nil x 0.0)
+  (foreach p *uchi-points*
+    (if prev (setq x (+ x (uchi:point-distance2d prev p))))
+    (setq acc (append acc (list (list x (nth 3 p)))))
+    (setq prev p)
+  )
+  acc
+)
+
+(defun uchi:draw-text (pt h txt layer)
+  (uchi:ensure-layer layer 7)
+  (entmake
+    (list
+      (cons 0 "TEXT")
+      (cons 8 layer)
+      (cons 10 pt)
+      (cons 40 h)
+      (cons 1 txt)
+      (cons 7 "STANDARD")
+    )
+  )
+)
+
+(defun uchi:point-at-chainage (pk / i p1 p2 seglen acc t)
+  (setq i 0 acc 0.0)
+  (while (< (+ i 1) (length *uchi-points*))
+    (setq p1 (nth i *uchi-points*))
+    (setq p2 (nth (+ i 1) *uchi-points*))
+    (setq seglen (uchi:point-distance2d p1 p2))
+    (if (and (> seglen 0.0) (>= (+ acc seglen) pk))
+      (progn
+        (setq t (/ (- pk acc) seglen))
+        (setq i (length *uchi-points*))
+        (setq p1
+          (list
+            "STA"
+            (+ (cadr p1) (* t (- (cadr p2) (cadr p1))))
+            (+ (caddr p1) (* t (- (caddr p2) (caddr p1))))
+            (+ (nth 3 p1) (* t (- (nth 3 p2) (nth 3 p1))))
+          )
+        )
+      )
+      (progn
+        (setq acc (+ acc seglen))
+        (setq i (+ i 1))
+      )
+    )
+  )
+  (if (and p1 (= (car p1) "STA")) p1 nil)
+)
+
+(defun uchi:profile-stations (step / l pk out s)
+  (setq l (uchi:profile-length))
+  (setq pk 0.0 out nil)
+  (while (<= pk l)
+    (setq s (uchi:point-at-chainage pk))
+    (if s (setq out (append out (list (list pk (nth 3 s))))))
+    (setq pk (+ pk step))
+  )
+  out
+)
+
+(defun uchi:profile-template (len zmin zmax hs vs / w h gpk gz x z)
+  (setq w (/ len hs))
+  (setq h (* (- zmax zmin) vs))
+  (uchi:draw-polyline-2d (list (list 0.0 0.0) (list w 0.0) (list w h) (list 0.0 h) (list 0.0 0.0)) "UCHI_PROFILE")
+  (setq gpk (uchi:profile-pk-step) gz (uchi:profile-grid-z-step))
+  (setq x 0.0)
+  (while (<= x w)
+    (uchi:draw-line (list x 0.0 0.0) (list x h 0.0) "UCHI_PROFILE")
+    (uchi:draw-text (list x -1.2 0.0) 0.8 (strcat "PK " (rtos (* x hs) 2 0)) "UCHI_PROFILE")
+    (setq x (+ x (/ gpk hs)))
+  )
+  (setq z zmin)
+  (while (<= z zmax)
+    (uchi:draw-line (list 0.0 (* (- z zmin) vs) 0.0) (list w (* (- z zmin) vs) 0.0) "UCHI_PROFILE")
+    (uchi:draw-text (list -6.0 (* (- z zmin) vs) 0.0) 0.8 (strcat "Cota " (rtos z 2 2)) "UCHI_PROFILE")
+    (setq z (+ z gz))
+  )
+)
+
+(defun C:UCHI_PERFIL (/ l pts hs vs zmin zmax stp sta pxy)
+  (uchi:topo-init)
+  (if (> (length *uchi-points*) 1)
+    (progn
+      (setq l (uchi:profile-length))
+      (setq hs (uchi:profile-h-scale) vs (uchi:profile-v-scale))
+      (setq zmin (uchi:to-real (uchi:project-get "z_min")))
+      (setq zmax (uchi:to-real (uchi:project-get "z_max")))
+      (if (>= zmin zmax) (setq zmax (+ zmin 1.0)))
+
+      (uchi:profile-template l zmin zmax hs vs)
+      (setq pts (uchi:profile-polyline-points))
+      (setq pxy nil)
+      (foreach p pts
+        (setq pxy (append pxy (list (list (/ (car p) hs) (* (- (cadr p) zmin) vs)))))
+      )
+      (uchi:draw-polyline-2d pxy "UCHI_PROFILE")
+
+      (setq stp (uchi:profile-pk-step))
+      (setq sta (uchi:profile-stations stp))
+      (foreach p sta
+        (uchi:draw-text (list (/ (car p) hs) (+ (* (- (cadr p) zmin) vs) 0.7) 0.0)
+                        0.8
+                        (strcat "PK " (rtos (car p) 2 0) " / " (rtos (cadr p) 2 2))
+                        "UCHI_PROFILE")
+      )
+      (uchi:project-set "profile_hscale" hs)
+      (uchi:project-set "profile_vscale" vs)
+      (uchi:project-save)
+      (uchi:log (strcat "Perfil avanzado: longitud=" (rtos l 2 2) " m, H=" (rtos hs 2 2) ", V=" (rtos vs 2 2)))
+    )
+    (uchi:log "Perfil: faltan puntos suficientes para generar perfil.")
+  )
+  (princ)
+)
+
+(princ)

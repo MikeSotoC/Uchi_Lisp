@@ -1,0 +1,57 @@
+;;; UCHI Sections routines
+
+(defun uchi:section-interval () (max 1 (atoi (vl-princ-to-string (or (getenv "UCHI_CFG_SECTION_INTERVAL") 20)))))
+(defun uchi:sections-ready-p () (> (length *uchi-points*) 2))
+(defun uchi:section-width () (max 5.0 (uchi:to-real (or (getenv "UCHI_CFG_SECTION_WIDTH") 20.0))))
+(defun uchi:section-height () (max 2.0 (uchi:to-real (or (getenv "UCHI_CFG_SECTION_HEIGHT") 8.0))))
+(defun uchi:section-columns () (max 1 (atoi (vl-princ-to-string (or (getenv "UCHI_CFG_SECTION_COLS") 4)))))
+
+(defun uchi:draw-section-template (ox oy w h title)
+  (uchi:draw-polyline-2d
+    (list (list ox oy)
+          (list (+ ox w) oy)
+          (list (+ ox w) (+ oy h))
+          (list ox (+ oy h))
+          (list ox oy))
+    "UCHI_SECTIONS")
+  (uchi:draw-line (list (+ ox (/ w 2.0)) oy 0.0) (list (+ ox (/ w 2.0)) (+ oy h) 0.0) "UCHI_SECTIONS")
+  (uchi:draw-line (list ox (+ oy (/ h 2.0)) 0.0) (list (+ ox w) (+ oy (/ h 2.0)) 0.0) "UCHI_SECTIONS")
+  (if (fboundp 'uchi:draw-text)
+    (uchi:draw-text (list (+ ox 0.4) (+ oy h 0.4) 0.0) 0.8 title "UCHI_SECTIONS")
+  )
+)
+
+(defun C:UCHI_SECCIONES (/ l i n idx cols w h row col ox oy st p)
+  (uchi:topo-init)
+  (if (uchi:sections-ready-p)
+    (progn
+      (setq l (uchi:profile-length))
+      (setq i (uchi:section-interval))
+      (setq n (+ 1 (fix (/ l i))))
+      (setq cols (uchi:section-columns))
+      (setq w (uchi:section-width))
+      (setq h (uchi:section-height))
+      (setq st (uchi:profile-stations i))
+      (setq idx 0)
+      (repeat n
+        (setq row (fix (/ idx cols)))
+        (setq col (rem idx cols))
+        (setq ox (+ (* col (+ w 4.0)) 0.0))
+        (setq oy (- 0.0 (* row (+ h 4.0))))
+        (setq p (if (< idx (length st)) (nth idx st) (list (* idx i) 0.0)))
+        (uchi:draw-section-template
+          ox oy w h
+          (strcat "PK " (rtos (car p) 2 0) " / Cota " (rtos (cadr p) 2 2)))
+        (setq idx (+ idx 1))
+      )
+      (uchi:project-set "sections_interval" i)
+      (uchi:project-set "sections_count" n)
+      (uchi:project-save)
+      (uchi:log (strcat "Secciones avanzadas: " (itoa n) " plantillas, intervalo=" (itoa i) " m, cols=" (itoa cols)))
+    )
+    (uchi:log "Secciones: se requieren puntos válidos para generar secciones.")
+  )
+  (princ)
+)
+
+(princ)
