@@ -43,6 +43,12 @@
     ((= action "volume")
       (C:UCHI_VOLUMEN)
     )
+    ((= action "qc")
+      (C:UCHI_QC)
+    )
+    ((= action "release")
+      (C:UCHI_RELEASE_GO)
+    )
     (T
       (uchi:log "UI cancelada o no disponible.")
     )
@@ -103,6 +109,14 @@
 
 (defun C:UCHI_VOL ()
   (C:UCHI_VOLUMEN)
+)
+
+(defun C:UCHI_QA ()
+  (C:UCHI_QC)
+)
+
+(defun C:UCHI_GO ()
+  (C:UCHI_RELEASE_GO)
 )
 
 (defun C:TOPO_BASE ()

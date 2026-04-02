@@ -105,6 +105,7 @@
       (C:UCHI_SECCIONES)
       (C:UCHI_ALINEAMIENTO)
       (C:UCHI_VOLUMEN)
+      (C:UCHI_QC)
       (C:UCHI_REPORTE)
 
       (uchi:log (strcat "Proceso integral OK. Triángulos=" (itoa (length mesh))

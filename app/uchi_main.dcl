@@ -69,6 +69,16 @@ uchi_main : dialog {
       label = "Generar volumen";
       is_default = false;
     }
+    : button {
+      key = "run_qc";
+      label = "Ejecutar QC";
+      is_default = false;
+    }
+    : button {
+      key = "run_release";
+      label = "Release GO/NO-GO";
+      is_default = false;
+    }
     : spacer {}
     ok_cancel;
   }
