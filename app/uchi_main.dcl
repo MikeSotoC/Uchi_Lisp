@@ -34,6 +34,11 @@ uchi_main : dialog {
       label = "Generar perfil";
       is_default = false;
     }
+    : button {
+      key = "build_curves";
+      label = "Generar curvas";
+      is_default = false;
+    }
     : spacer {}
     ok_cancel;
   }

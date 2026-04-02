@@ -19,6 +19,7 @@
           (action_tile "valid_pts" "(setq action \"valid\") (done_dialog 1)")
           (action_tile "build_surface" "(setq action \"surface\") (done_dialog 1)")
           (action_tile "build_profile" "(setq action \"profile\") (done_dialog 1)")
+          (action_tile "build_curves" "(setq action \"curves\") (done_dialog 1)")
           (action_tile "accept" "(setq action \"ok\") (done_dialog 1)")
           (action_tile "cancel" "(setq action \"cancel\") (done_dialog 0)")
           (start_dialog)

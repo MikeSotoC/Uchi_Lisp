@@ -177,9 +177,7 @@
 )
 
 (defun C:UCHI_CURVAS ()
-  (uchi:topo-init)
-  (uchi:log "Módulo curvas: preparado para generación de curvas.")
-  (princ)
+  (C:UCHI_CURVAS_GEN)
 )
 
 (defun C:UCHI_FLUJO ()
