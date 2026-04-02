@@ -9,7 +9,8 @@
 - Ruta activa derivada de `main.lsp` cargado por APPLOAD (sin fallback ambiguo por Support Path).
 - Carga determinista: orden explícito + validación de existencia antes de `(load ...)`.
 - Compatibilidad backward: aceptar claves legacy en lectura y serializar con naming UCHI.
-- Logging mínimo obligatorio con prefijo `[UCHI]`.
+- Logging mínimo obligatorio con prefijo `[UCHI]` + archivo rotativo `uchi_runtime.log`.
+- Ejecutar migración de variables legacy con `UCHI_MIGRAR` antes de smoke final.
 
 ## Fase 3 — Release hygiene
 - Commits atómicos: `hotfix(app-dir):`, `refactor(branding):`, `chore(release):`.

@@ -30,3 +30,7 @@ En ambos:
   - `UCHI_CFG_QA_AUTOCAD_VER` (ej. `2024.1`)
   - `UCHI_CFG_QA_ZWCAD_VER` (ej. `2025`)
   - `UCHI_CFG_QA_EVID_DIR` (ej. `evidencias/qa_cad/`)
+
+## Migración y trazabilidad operativa
+- Comando de migración legacy: `UCHI_MIGRAR` (genera `uchi_migracion_legacy.csv`).
+- Trazabilidad de ejecución: `uchi_runtime.log` con rotación por tamaño (`UCHI_CFG_LOG_MAX_BYTES`).

@@ -48,14 +48,15 @@ Validar carga estable por APPLOAD, comandos base y aislamiento de ruta activa.
 38. Ejecutar `UCHI_PAV` y verificar `uchi_pavimentos.csv` con metrados por capa y chequeo `cumple_norma` según `trafico`.
 39. Ejecutar `UCHI_INTERF` y verificar `uchi_interferencias.csv` con cruces detectados, `severidad`, `severidad_criticidad`, `sep_min_norma`, `sep_vertical_min` e `incumple_norma`.
 40. Ejecutar `UCHI_QA_CAD` y verificar `uchi_qa_cad_matrix.csv` con plataformas AutoCAD/ZWCAD y versión configurada.
-41. Ejecutar `UCHI_EXP` y verificar `uchi_expediente.txt` + `uchi_expediente_cuadros.csv` + `uchi_expediente_final.csv`.
-42. Ejecutar `UCHI_ROAD` y validar dibujo de secciones tipo en capa `UCHI_ROAD` + archivo `uchi_carretera_norma.csv` con chequeo normativo base.
-43. Ejecutar `UCHI_EXPORT_LANDXML` y verificar `uchi_surface.xml` con caras `<Faces>`.
-44. Ejecutar `UCHI_DIAG` y validar launcher/appdir en logs.
-45. Revisar logs `[UCHI] Flujo topográfico base iniciado/completado`.
-46. Forzar fallback: mover temporalmente módulos de A y dejar `UCHI_APP_DIR` a B.
-47. Verificar que el sistema anuncia fallback usado y ruta final activa.
-48. Restaurar módulos y repetir APPLOAD en A.
+41. Ejecutar `UCHI_MIGRAR` y verificar `uchi_migracion_legacy.csv` (claves migradas SI/NO).
+42. Ejecutar `UCHI_EXP` y verificar `uchi_expediente.txt` + `uchi_expediente_cuadros.csv` + `uchi_expediente_normativa.csv` + `uchi_expediente_final.csv`.
+43. Ejecutar `UCHI_ROAD` y validar dibujo de secciones tipo en capa `UCHI_ROAD` + archivo `uchi_carretera_norma.csv` con chequeo normativo base.
+44. Ejecutar `UCHI_EXPORT_LANDXML` y verificar `uchi_surface.xml` con caras `<Faces>`.
+45. Ejecutar `UCHI_DIAG` y validar launcher/appdir en logs.
+46. Revisar logs `[UCHI]` y archivo `uchi_runtime.log` (rotación si supera `UCHI_CFG_LOG_MAX_BYTES`).
+47. Forzar fallback: mover temporalmente módulos de A y dejar `UCHI_APP_DIR` a B.
+48. Verificar que el sistema anuncia fallback usado y ruta final activa.
+49. Restaurar módulos y repetir APPLOAD en A.
 
 ## Criterio GO
 - No hay mezcla de `app/` entre instalaciones.

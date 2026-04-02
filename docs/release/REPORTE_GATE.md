@@ -1,6 +1,6 @@
 # UCHI — Reporte de Gate de Release
 
-Fecha: 2026-04-02 08:49:21 UTC
+Fecha: 2026-04-02 08:56:49 UTC
 
 ## Contexto
 Este gate prioriza estabilidad de producción y bloquea release cuando faltan artefactos críticos.
@@ -70,22 +70,22 @@ Resultado: PASS
 ./docs/release/SMOKE_TEST_CAD.md:4:Validar carga estable por APPLOAD, comandos base y aislamiento de ruta activa.
 ./docs/release/SMOKE_TEST_CAD.md:8:- APPLOAD apuntando explícitamente a `main.lsp` de la instalación A.
 ./docs/release/SMOKE_TEST_CAD.md:12:2. Ejecutar APPLOAD sobre `.../A/main.lsp`.
-./docs/release/SMOKE_TEST_CAD.md:58:48. Restaurar módulos y repetir APPLOAD en A.
-./docs/release/SMOKE_TEST_CAD.md:61:- No hay mezcla de `app/` entre instalaciones.
+./docs/release/SMOKE_TEST_CAD.md:59:49. Restaurar módulos y repetir APPLOAD en A.
+./docs/release/SMOKE_TEST_CAD.md:62:- No hay mezcla de `app/` entre instalaciones.
 ./docs/release/REPORTE_GATE.md:21:test -f main.lsp
 ./docs/release/REPORTE_GATE.md:28:### Launcher no vive dentro de app/
 ./docs/release/REPORTE_GATE.md:30:test ! -f app/main.lsp
 ./docs/release/REPORTE_GATE.md:39:test -f app/uchi_cad_compat.lsp
 ./docs/release/REPORTE_GATE.md:48:rg -n 'CivilCAD-like|civilcad|CivilCAD' app/uchi_ui.lsp app/uchi_commands.lsp app/*.dcl
 ./docs/release/REPORTE_GATE.md:57:rg -n --glob '!.git/**' 'main.lsp|APPLOAD|app/|autoload|Support Path|support path|\(load' . || true
-./docs/release/PLAN_INTERVENCION_PROD.md:9:- Ruta activa derivada de `main.lsp` cargado por APPLOAD (sin fallback ambiguo por Support Path).
-./docs/release/PLAN_INTERVENCION_PROD.md:10:- Carga determinista: orden explícito + validación de existencia antes de `(load ...)`.
 ./main.lsp:2:;;; Cargar este archivo por APPLOAD (fuera de app/).
 ./main.lsp:7:(setq *uchi-launcher-name* "main.lsp")
-./main.lsp:97:  ;; 1) app/ relativo al launcher cargado por APPLOAD.
-./main.lsp:135:    (progn (load full nil) T)
-./main.lsp:146:      (uchi:log "ERROR launcher inválido. APPLOAD debe apuntar a main.lsp fuera de app/.")
-./main.lsp:153:          (uchi:log "ERROR no se pudo resolver app/. Use UCHI_APP_DIR válido o selección manual.")
+./main.lsp:129:  ;; 1) app/ relativo al launcher cargado por APPLOAD.
+./main.lsp:167:    (progn (load full nil) T)
+./main.lsp:178:      (uchi:log "ERROR launcher inválido. APPLOAD debe apuntar a main.lsp fuera de app/.")
+./main.lsp:185:          (uchi:log "ERROR no se pudo resolver app/. Use UCHI_APP_DIR válido o selección manual.")
+./docs/release/PLAN_INTERVENCION_PROD.md:9:- Ruta activa derivada de `main.lsp` cargado por APPLOAD (sin fallback ambiguo por Support Path).
+./docs/release/PLAN_INTERVENCION_PROD.md:10:- Carga determinista: orden explícito + validación de existencia antes de `(load ...)`.
 ```
 
 ## Gate de artefactos

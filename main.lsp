@@ -6,10 +6,6 @@
 (setq *uchi-version* "1.1.0")
 (setq *uchi-launcher-name* "main.lsp")
 
-(defun uchi:log (msg)
-  (princ (strcat "\n[UCHI] " msg))
-)
-
 (defun uchi:path-normalize (p)
   (if p (vl-string-translate "\\" "/" p) nil)
 )
@@ -22,8 +18,44 @@
   (and p (findfile p))
 )
 
+(defun uchi:log-file-path ()
+  (strcat (if (uchi:launcher-dir) (uchi:launcher-dir) ".") "/uchi_runtime.log")
+)
+
+(defun uchi:log-max-bytes ()
+  (fix (atof (vl-princ-to-string (or (getenv "UCHI_CFG_LOG_MAX_BYTES") 262144))))
+)
+
+(defun uchi:log-rotate-if-needed (/ p maxb)
+  (setq p (uchi:log-file-path))
+  (setq maxb (max 10240 (uchi:log-max-bytes)))
+  (if (and (findfile p) (> (vl-file-size p) maxb))
+    (progn
+      (if (findfile (strcat p ".1")) (vl-file-delete (strcat p ".1")))
+      (vl-file-rename p (strcat p ".1"))
+    )
+  )
+)
+
+(defun uchi:log-write-file (msg / fp p)
+  (setq p (uchi:log-file-path))
+  (uchi:log-rotate-if-needed)
+  (setq fp (open p "a"))
+  (if fp
+    (progn
+      (write-line (strcat "[UCHI] " msg) fp)
+      (close fp)
+    )
+  )
+)
+
+(defun uchi:log (msg)
+  (princ (strcat "\n[UCHI] " msg))
+  (uchi:log-write-file msg)
+)
+
 (defun uchi:required-modules ()
-  (list "uchi_cad_compat.lsp" "uchi_core.lsp" "uchi_config.lsp" "uchi_module_registry.lsp" "uchi_ui.lsp" "uchi_commands.lsp" "uchi_topo.lsp" "uchi_persistence.lsp" "uchi_templates_pe.lsp" "uchi_surface.lsp" "uchi_profile.lsp" "uchi_curves.lsp" "uchi_sections.lsp" "uchi_stakeout.lsp" "uchi_drainage.lsp" "uchi_hidraulica.lsp" "uchi_catastro.lsp" "uchi_catastro_rural.lsp" "uchi_subdivision.lsp" "uchi_utilidades.lsp" "uchi_interferencias.lsp" "uchi_pavimentos.lsp" "uchi_carreteras.lsp" "uchi_expediente.lsp" "uchi_report.lsp" "uchi_alignment.lsp" "uchi_volume.lsp" "uchi_qc.lsp" "uchi_styles.lsp" "uchi_landxml.lsp" "uchi_boundary.lsp" "uchi_tin.lsp" "uchi_engine.lsp")
+  (list "uchi_cad_compat.lsp" "uchi_core.lsp" "uchi_config.lsp" "uchi_module_registry.lsp" "uchi_ui.lsp" "uchi_commands.lsp" "uchi_topo.lsp" "uchi_persistence.lsp" "uchi_templates_pe.lsp" "uchi_surface.lsp" "uchi_profile.lsp" "uchi_curves.lsp" "uchi_sections.lsp" "uchi_stakeout.lsp" "uchi_drainage.lsp" "uchi_hidraulica.lsp" "uchi_catastro.lsp" "uchi_catastro_rural.lsp" "uchi_subdivision.lsp" "uchi_utilidades.lsp" "uchi_interferencias.lsp" "uchi_pavimentos.lsp" "uchi_carreteras.lsp" "uchi_expediente.lsp" "uchi_report.lsp" "uchi_alignment.lsp" "uchi_volume.lsp" "uchi_qc.lsp" "uchi_styles.lsp" "uchi_landxml.lsp" "uchi_boundary.lsp" "uchi_tin.lsp" "uchi_engine.lsp" "uchi_migrador.lsp")
 )
 
 (defun uchi:launcher-file ()

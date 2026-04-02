@@ -20,8 +20,8 @@
 4. **Perfiles y secciones**: ya incluyen plantilla, escalas H/V, rasante por offset, bandas técnicas, offset L/R y presets normativos base (MOP/MTC/CUSTOM); falta catálogo completo de estilos por cliente.
 5. **Persistencia**: ahora se genera snapshot `.uchi.json` versionado (schema 1.0.0) en paralelo a `.dat`; falta carga directa desde JSON y migrador bidireccional completo.
 6. **QA CAD real**: matriz base automatizada `uchi_qa_cad_matrix.csv` por plataforma/versión (`UCHI_CFG_QA_AUTOCAD_VER`, `UCHI_CFG_QA_ZWCAD_VER`) con estado de checks y ruta de evidencias. Falta completar evidencias reales por versión instalada del cliente.
-7. **Telemetría soporte**: log a archivo con rotación (además de consola `[UCHI]`).
-8. **Migrador legacy**: asistente para mapear configuraciones antiguas a esquema UCHI.
+7. **Telemetría soporte**: logging a consola + archivo runtime `uchi_runtime.log` con rotación (`UCHI_CFG_LOG_MAX_BYTES`). Falta envío/centralización de eventos.
+8. **Migrador legacy**: asistente base `UCHI_MIGRAR_LEGACY` implementado con reporte `uchi_migracion_legacy.csv`; falta cubrir catálogos legacy extensos por cliente.
 9. **Replanteo**: módulo base `UCHI_STAKEOUT` implementado (puntos pk/offset y CSV); falta integrar catálogo de códigos y salida para estación total/GNSS.
 10. **Drenaje/Cunetas**: módulo `UCHI_DRENAJE` ahora exporta chequeo normativo por segmento (rango de pendiente longitudinal/transversal configurable). Falta cálculo hidráulico avanzado por evento de diseño.
 11. **Catastro**: módulos base urbano (`UCHI_CATASTRO`) y rural (`UCHI_CATASTRO_RURAL`) implementados (lotes/predios y CSV); falta integración con nomenclatura oficial y validación SUNARP/Municipal.
@@ -34,7 +34,7 @@
 15. **Hidrología/Hidráulica**: módulo implementado (`UCHI_HIDRAULICA`) con método racional + Manning + selección de diámetro comercial por tramo y chequeo de diámetro mínimo normativo/velocidad en `uchi_hidraulica_tramos.csv`. Falta calibración normativa por tipo de sistema/proyecto.
 16. **Pavimentos**: módulo `UCHI_PAVIMENTOS` ahora incorpora chequeo normativo por nivel de tránsito (`BAJO/MEDIO/ALTO`) para espesores mínimos por capa; falta diseño estructural completo por tránsito/material/CBR.
 17. **Interferencias 3D**: módulo implementado (`UCHI_INTERFERENCIAS`) con severidad por separación normativa, criticidad por tipo de red y control de separación vertical mínima (`sep_vertical_min`). Falta motor espacial robusto por corredor 3D.
-18. **Expediente técnico**: módulo automatizado (`UCHI_EXPEDIENTE`) ahora genera resumen, cuadro por disciplina y consolidado final (`uchi_expediente_final.csv`) con estado de entregables + QA CAD. Falta armado completo de planos/cuadros normativos finales.
+18. **Expediente técnico**: módulo automatizado (`UCHI_EXPEDIENTE`) ahora genera resumen, cuadro por disciplina, chequeo normativo (`uchi_expediente_normativa.csv`) y consolidado final (`uchi_expediente_final.csv`) con estado de entregables + QA CAD. Falta integrar firmas/aprobaciones y layout final de planos.
 
 ## Criterio para “parecerse a CivilCAD” sin copiar
 - Misma intención de flujo topográfico de alto nivel (proyecto -> puntos -> superficie/curvas -> perfil).

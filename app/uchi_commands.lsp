@@ -231,6 +231,10 @@
   (C:UCHI_EXPEDIENTE)
 )
 
+(defun C:UCHI_MIGRAR ()
+  (C:UCHI_MIGRAR_LEGACY)
+)
+
 (defun C:TOPO_BASE ()
   ;; Alias legacy.
   (C:UCHI_TOPO)
