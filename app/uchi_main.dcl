@@ -39,6 +39,11 @@ uchi_main : dialog {
       label = "Generar curvas";
       is_default = false;
     }
+    : button {
+      key = "build_sections";
+      label = "Generar secciones";
+      is_default = false;
+    }
     : spacer {}
     ok_cancel;
   }

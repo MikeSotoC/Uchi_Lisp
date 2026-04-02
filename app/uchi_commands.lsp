@@ -25,6 +25,9 @@
     ((= action "curves")
       (C:UCHI_CURVAS_GEN)
     )
+    ((= action "sections")
+      (C:UCHI_SECCIONES)
+    )
     (T
       (uchi:log "UI cancelada o no disponible.")
     )
@@ -62,6 +65,10 @@
   (C:UCHI_PERFIL)
 )
 
+
+(defun C:UCHI_SEC ()
+  (C:UCHI_SECCIONES)
+)
 
 (defun C:TOPO_BASE ()
   ;; Alias legacy.
