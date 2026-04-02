@@ -8,35 +8,49 @@
   )
 )
 
+;; Mapa: clave nueva -> lista de claves legacy aceptadas en lectura.
 (setq *uchi-legacy-key-map*
   (list
-    (cons "civilcad_brand" "brand")
-    (cons "civilcad_cmd_main" "main_command")
-    (cons "civilcad_cmd_topo" "topo_command")
+    (cons "brand" (list "civilcad_brand"))
+    (cons "main_command" (list "civilcad_cmd_main" "main_cmd"))
+    (cons "topo_command" (list "civilcad_cmd_topo" "topo_cmd"))
   )
 )
 
+(defun uchi:cfg-env-key (k)
+  (strcat "UCHI_CFG_" (strcase k))
+)
+
 (defun uchi:cfg-get-raw (k / envv)
-  (setq envv (getenv (strcat "UCHI_CFG_" (strcase k))))
+  (setq envv (getenv (uchi:cfg-env-key k)))
   (if envv envv nil)
 )
 
-(defun uchi:cfg-get-legacy (legacy-k)
-  (getenv (strcat "UCHI_CFG_" (strcase legacy-k)))
+(defun uchi:cfg-get-legacy (legacy-keys / val)
+  (setq val nil)
+  (while (and legacy-keys (not val))
+    (setq val (getenv (uchi:cfg-env-key (car legacy-keys))))
+    (setq legacy-keys (cdr legacy-keys))
+  )
+  val
 )
 
-(defun uchi:cfg-get (k / v pair legacy)
-  (setq v (uchi:cfg-get-raw k))
-  (if v
-    v
+(defun uchi:cfg-get-default (k)
+  (cdr (assoc k *uchi-config-default*))
+)
+
+(defun uchi:cfg-get (k / raw legacyPair legacyVal)
+  (setq raw (uchi:cfg-get-raw k))
+  (if raw
+    raw
     (progn
-      (setq pair (assoc (strcase k) (mapcar '(lambda (x) (cons (strcase (car x)) (cdr x))) *uchi-legacy-key-map*)))
-      (if pair
+      (setq legacyPair (assoc k *uchi-legacy-key-map*))
+      (if legacyPair
         (progn
-          (setq legacy (uchi:cfg-get-legacy (cdr pair)))
-          (if legacy legacy nil)
+          (setq legacyVal (uchi:cfg-get-legacy (cdr legacyPair)))
+          (if legacyVal legacyVal (uchi:cfg-get-default k))
         )
-        (cdr (assoc k *uchi-config-default*))
+        (uchi:cfg-get-default k)
       )
     )
   )

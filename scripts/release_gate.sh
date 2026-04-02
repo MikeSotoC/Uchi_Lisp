@@ -65,8 +65,10 @@ append "## Checks automáticos"
 append ""
 
 run_check "Whitespace check" "git diff --check"
+run_check "Launcher principal presente" "test -f main.lsp"
+run_check "Launcher no vive dentro de app/" "test ! -f app/main.lsp"
 run_must_be_empty "Branding legacy visible en UI/mensajes" "rg -n 'CivilCAD-like|civilcad|CivilCAD' app/uchi_ui.lsp app/uchi_commands.lsp app/*.dcl"
-run_check "Referencias de carga/rutas (inventario)" "rg -n --glob '!.git/**' 'APPLOAD|app/|autoload|Support Path|support path|\\(load' . || true"
+run_check "Referencias de carga/rutas (inventario)" "rg -n --glob '!.git/**' 'main.lsp|APPLOAD|app/|autoload|Support Path|support path|\\(load' . || true"
 
 append "## Gate de artefactos"
 if rg --files | rg -q '\.(lsp|dcl)$'; then

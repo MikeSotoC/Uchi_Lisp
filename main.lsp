@@ -3,7 +3,8 @@
 
 (vl-load-com)
 
-(setq *uchi-version* "1.0.1")
+(setq *uchi-version* "1.1.0")
+(setq *uchi-launcher-name* "main.lsp")
 
 (defun uchi:log (msg)
   (princ (strcat "\n[UCHI] " msg))
@@ -28,7 +29,7 @@
 (defun uchi:launcher-file ()
   (cond
     ((and (boundp '*load-truename*) *load-truename*) *load-truename*)
-    ((findfile "main.lsp"))
+    ((findfile *uchi-launcher-name*))
     (T nil)
   )
 )
@@ -38,6 +39,16 @@
   (if f
     (vl-filename-directory (uchi:path-normalize f))
     nil
+  )
+)
+
+(defun uchi:launcher-valid-p (/ f d)
+  (setq f (uchi:launcher-file))
+  (setq d (uchi:launcher-dir))
+  (and f
+       d
+       (= (strcase (strcat (vl-filename-base f) "." (vl-filename-extension f))) (strcase *uchi-launcher-name*))
+       (not (wcmatch (strcase d) "*/APP"))
   )
 )
 
@@ -51,13 +62,22 @@
   ok
 )
 
-(defun uchi:app-dir-from-launcher (/ basedir appdir)
+(defun uchi:missing-modules (appdir / out mod)
+  (setq out nil)
+  (foreach mod (uchi:required-modules)
+    (if (not (uchi:file-exists-p (uchi:path-join appdir mod)))
+      (setq out (cons mod out))
+    )
+  )
+  (reverse out)
+)
+
+(defun uchi:app-dir-from-launcher (/ basedir)
   (setq basedir (uchi:launcher-dir))
   (if basedir
-    (setq appdir (uchi:path-join basedir "app"))
-    (setq appdir nil)
+    (uchi:path-join basedir "app")
+    nil
   )
-  appdir
 )
 
 (defun uchi:validated-saved-app-dir (/ saved)
@@ -74,7 +94,6 @@
 )
 
 (defun uchi:resolve-app-dir (/ active saved manual)
-  ;; Estrategia determinista:
   ;; 1) app/ relativo al launcher cargado por APPLOAD.
   ;; 2) ruta guardada validada.
   ;; 3) selector manual.
@@ -121,26 +140,37 @@
   )
 )
 
-(defun uchi:load-all-modules (/ appdir ok mod)
-  (setq appdir (uchi:resolve-app-dir))
-  (if (not appdir)
+(defun uchi:load-all-modules (/ appdir ok mod missing)
+  (if (not (uchi:launcher-valid-p))
     (progn
-      (uchi:log "ERROR no se pudo resolver app/. Use UCHI_APP_DIR válido o selección manual.")
+      (uchi:log "ERROR launcher inválido. APPLOAD debe apuntar a main.lsp fuera de app/.")
       nil
     )
     (progn
-      (setenv "UCHI_APP_DIR" appdir)
-      (setq ok T)
-      (foreach mod (uchi:required-modules)
-        (if (not (uchi:load-module appdir mod))
-          (setq ok nil)
+      (setq appdir (uchi:resolve-app-dir))
+      (if (not appdir)
+        (progn
+          (uchi:log "ERROR no se pudo resolver app/. Use UCHI_APP_DIR válido o selección manual.")
+          nil
+        )
+        (progn
+          (setenv "UCHI_APP_DIR" appdir)
+          (setq ok T)
+          (foreach mod (uchi:required-modules)
+            (if (not (uchi:load-module appdir mod))
+              (setq ok nil)
+            )
+          )
+          (if ok
+            (uchi:log (strcat "Carga determinista completada. Versión " *uchi-version*))
+            (progn
+              (setq missing (uchi:missing-modules appdir))
+              (uchi:log (strcat "Carga incompleta. Faltan: " (vl-princ-to-string missing)))
+            )
+          )
+          ok
         )
       )
-      (if ok
-        (uchi:log (strcat "Carga determinista completada. Versión " *uchi-version*))
-        (uchi:log "Carga incompleta: revisar módulos faltantes.")
-      )
-      ok
     )
   )
 )
@@ -149,6 +179,16 @@
   (if (uchi:load-all-modules)
     (uchi:log "UCHI_INIT OK.")
     (uchi:log "UCHI_INIT FAIL.")
+  )
+  (princ)
+)
+
+(defun C:UCHI_DIAG (/ appdir)
+  (setq appdir (uchi:resolve-app-dir))
+  (uchi:log (strcat "Launcher: " (if (uchi:launcher-file) (uchi:launcher-file) "N/A")))
+  (uchi:log (strcat "AppDir: " (if appdir appdir "N/A")))
+  (if appdir
+    (uchi:log (strcat "Módulos faltantes: " (vl-princ-to-string (uchi:missing-modules appdir))))
   )
   (princ)
 )

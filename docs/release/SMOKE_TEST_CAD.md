@@ -14,10 +14,11 @@ Validar carga estable por APPLOAD, comandos base y aislamiento de ruta activa.
 4. Ejecutar comando `UCHI`.
 5. Confirmar diálogo con título **UCHI** (sin branding legacy).
 6. Ejecutar comando `UCHI_TOPO`.
-7. Revisar logs `[UCHI] Flujo topográfico base iniciado/completado`.
-8. Forzar fallback: mover temporalmente módulos de A y dejar `UCHI_APP_DIR` a B.
-9. Verificar que el sistema anuncia fallback usado y ruta final activa.
-10. Restaurar módulos y repetir APPLOAD en A.
+7. Ejecutar `UCHI_DIAG` y validar launcher/appdir en logs.
+8. Revisar logs `[UCHI] Flujo topográfico base iniciado/completado`.
+9. Forzar fallback: mover temporalmente módulos de A y dejar `UCHI_APP_DIR` a B.
+10. Verificar que el sistema anuncia fallback usado y ruta final activa.
+11. Restaurar módulos y repetir APPLOAD en A.
 
 ## Criterio GO
 - No hay mezcla de `app/` entre instalaciones.
