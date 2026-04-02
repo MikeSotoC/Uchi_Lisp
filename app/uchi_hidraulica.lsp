@@ -7,6 +7,12 @@
 (defun uchi:hid-slope () (max 0.0001 (uchi:to-real (or (getenv "UCHI_CFG_HID_S") 0.005))))
 (defun uchi:hid-vmin () (max 0.10 (uchi:to-real (or (getenv "UCHI_CFG_HID_VMIN") 0.60))))
 (defun uchi:hid-vmax () (max (uchi:hid-vmin) (uchi:to-real (or (getenv "UCHI_CFG_HID_VMAX") 3.00))))
+(defun uchi:hid-diam-min-mm (red)
+  (if (= red "DESAGUE")
+    (uchi:to-real (or (getenv "UCHI_CFG_HID_DMIN_SEWER_MM") 160.0))
+    (uchi:to-real (or (getenv "UCHI_CFG_HID_DMIN_WATER_MM") 75.0))
+  )
+)
 
 (defun uchi:hid-q-rational-lps ()
   ;; Q(l/s)=2.78*C*I(mm/h)*A(ha)
@@ -38,7 +44,7 @@
   (setq out nil)
   (foreach line (uchi:read-lines path)
     (setq cols (uchi:split-csv-line line))
-    (if (= (length cols) 9)
+    (if (>= (length cols) 9)
       (if (/= (car cols) "pk")
         (setq out (append out (list cols)))
       )
@@ -67,7 +73,16 @@
   (* qbase (+ 0.35 (* 0.65 f)))
 )
 
-(defun uchi:hid-build-tramos-red (rows red qbase / rsorted out i total a b pk0 pk1 len q d v ok)
+(defun uchi:hid-commercial-diam (dmm / series best x)
+  (setq series (list 75.0 90.0 110.0 160.0 200.0 250.0 315.0 400.0 500.0 630.0 800.0 1000.0))
+  (setq best nil)
+  (foreach x series
+    (if (and (>= x dmm) (or (not best) (< x best))) (setq best x))
+  )
+  (if best best 1000.0)
+)
+
+(defun uchi:hid-build-tramos-red (rows red qbase / rsorted out i total a b pk0 pk1 len q d dcom v ok)
   (setq rsorted (uchi:hid-sort-by-pk (uchi:hid-filter-red rows red)))
   (setq out nil i 0 total (max 0 (- (length rsorted) 1)))
   (while (< i total)
@@ -78,9 +93,12 @@
     (setq len (max 0.01 (- pk1 pk0)))
     (setq q (uchi:hid-tramo-q qbase i total))
     (setq d (uchi:hid-diam-mm-suggested q))
-    (setq v (uchi:hid-vel-ms q d))
-    (setq ok (if (and (>= v (uchi:hid-vmin)) (<= v (uchi:hid-vmax))) "SI" "NO"))
-    (setq out (append out (list (list red pk0 pk1 len q d v ok))))
+    (setq dcom (uchi:hid-commercial-diam d))
+    (setq v (uchi:hid-vel-ms q dcom))
+    (setq ok (if (and (>= v (uchi:hid-vmin))
+                      (<= v (uchi:hid-vmax))
+                      (>= dcom (uchi:hid-diam-min-mm red))) "SI" "NO"))
+    (setq out (append out (list (list red pk0 pk1 len q d dcom v ok))))
     (setq i (+ i 1))
   )
   out
@@ -107,11 +125,12 @@
       (setq fp (open path "w"))
       (if fp
         (progn
-          (write-line "red,pk_ini,pk_fin,long_m,Q_lps,D_sugerido_mm,vel_m_s,cumple_rango_vel" fp)
+          (write-line "red,pk_ini,pk_fin,long_m,Q_lps,D_calc_mm,D_comercial_mm,vel_m_s,D_min_norma_mm,cumple_norma" fp)
           (foreach r tramos
             (write-line
               (strcat (car r) "," (rtos (nth 1 r) 2 2) "," (rtos (nth 2 r) 2 2) "," (rtos (nth 3 r) 2 2) ","
-                      (rtos (nth 4 r) 2 2) "," (rtos (nth 5 r) 2 1) "," (rtos (nth 6 r) 2 3) "," (nth 7 r))
+                      (rtos (nth 4 r) 2 2) "," (rtos (nth 5 r) 2 1) "," (rtos (nth 6 r) 2 1) ","
+                      (rtos (nth 7 r) 2 3) "," (rtos (uchi:hid-diam-min-mm (car r)) 2 1) "," (nth 8 r))
               fp
             )
           )
@@ -120,7 +139,7 @@
       )
       (setq okc 0)
       (foreach r tramos
-        (if (= (nth 7 r) "SI") (setq okc (+ okc 1)))
+        (if (= (nth 8 r) "SI") (setq okc (+ okc 1)))
       )
       (uchi:project-set "hid_q_lps" q)
       (uchi:project-set "hid_diam_mm" dmm)

@@ -23,16 +23,16 @@
 7. **Telemetría soporte**: log a archivo con rotación (además de consola `[UCHI]`).
 8. **Migrador legacy**: asistente para mapear configuraciones antiguas a esquema UCHI.
 9. **Replanteo**: módulo base `UCHI_STAKEOUT` implementado (puntos pk/offset y CSV); falta integrar catálogo de códigos y salida para estación total/GNSS.
-10. **Drenaje/Cunetas**: módulo base `UCHI_DRENAJE` implementado (longitudinal/transversal + CSV); falta cálculo hidráulico y validaciones normativas de pendiente mínima.
+10. **Drenaje/Cunetas**: módulo `UCHI_DRENAJE` ahora exporta chequeo normativo por segmento (rango de pendiente longitudinal/transversal configurable). Falta cálculo hidráulico avanzado por evento de diseño.
 11. **Catastro**: módulos base urbano (`UCHI_CATASTRO`) y rural (`UCHI_CATASTRO_RURAL`) implementados (lotes/predios y CSV); falta integración con nomenclatura oficial y validación SUNARP/Municipal.
 11.1 **Subdivisión**: módulo `UCHI_SUBDIVISION` ya usa boundary (polígono irregular), reserva vial orientada (`ROAD_EVERY` + `ROAD_ANGLE`), frente mínimo y aportes reglamentarios con cuadro de áreas automático; falta reglas municipales avanzadas de equipamiento y casuística urbana especial.
-12. **Redes agua/desagüe**: módulo base `UCHI_REDES` implementado (BZ/accesorios, pendiente y diámetros por template); falta cálculo hidráulico detallado y conflictos 3D.
-13. **Carreteras**: módulo base `UCHI_CARRETERA` implementado (secciones tipo y parámetros de plantilla) + templates `DG-2018` por categoría y tipo de terreno (plano/ondulado/accidentado); falta peraltes, sobreanchos y chequeos de norma MTC completos.
+12. **Redes agua/desagüe**: módulo `UCHI_REDES` ahora incluye chequeo normativo de diámetro/pendiente/cobertura mínima por red en `uchi_redes.csv`; falta cálculo hidráulico detallado y calibración completa por EPS/cliente.
+13. **Carreteras**: módulo `UCHI_CARRETERA` ahora incluye chequeo normativo base (ancho de carril, bermas y bombeo/peralte máximo) y exporta `uchi_carretera_norma.csv`; falta peraltes/sobreanchos en geometría de curva y validación MTC exhaustiva.
 14. **Organización de módulos**: `UCHI_MODULOS` implementado para inventario funcional por dominio; falta autogenerar documentación técnica desde registry.
 
 ## Módulos aún faltantes para objetivo “producto final”
-15. **Hidrología/Hidráulica**: módulo implementado (`UCHI_HIDRAULICA`) con método racional + diámetro sugerido por Manning y cuadro por tramos (`uchi_hidraulica_tramos.csv`) con verificación de rango de velocidad configurable (`Vmin/Vmax`). Falta calibración normativa por tipo de sistema/proyecto.
-16. **Pavimentos**: módulo base implementado (`UCHI_PAVIMENTOS`, metrados por capas). Falta diseño estructural por tránsito/material.
+15. **Hidrología/Hidráulica**: módulo implementado (`UCHI_HIDRAULICA`) con método racional + Manning + selección de diámetro comercial por tramo y chequeo de diámetro mínimo normativo/velocidad en `uchi_hidraulica_tramos.csv`. Falta calibración normativa por tipo de sistema/proyecto.
+16. **Pavimentos**: módulo `UCHI_PAVIMENTOS` ahora incorpora chequeo normativo por nivel de tránsito (`BAJO/MEDIO/ALTO`) para espesores mínimos por capa; falta diseño estructural completo por tránsito/material/CBR.
 17. **Interferencias 3D**: módulo implementado (`UCHI_INTERFERENCIAS`) con severidad por separación normativa, criticidad por tipo de red y control de separación vertical mínima (`sep_vertical_min`). Falta motor espacial robusto por corredor 3D.
 18. **Expediente técnico**: módulo base implementado (`UCHI_EXPEDIENTE`, resumen + estado de archivos + cuadro por disciplina). Falta armado completo de planos/cuadros normativos finales.
 
