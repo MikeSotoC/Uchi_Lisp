@@ -1,6 +1,6 @@
 # UCHI — Reporte de Gate de Release
 
-Fecha: 2026-04-02 08:08:25 UTC
+Fecha: 2026-04-02 08:15:02 UTC
 
 ## Contexto
 Este gate prioriza estabilidad de producción y bloquea release cuando faltan artefactos críticos.
@@ -58,12 +58,6 @@ rg -n --glob '!.git/**' 'main.lsp|APPLOAD|app/|autoload|Support Path|support pat
 ```
 Resultado: PASS
 ```text
-./scripts/release_gate.sh:68:run_check "Launcher principal presente" "test -f main.lsp"
-./scripts/release_gate.sh:69:run_check "Launcher no vive dentro de app/" "test ! -f app/main.lsp"
-./scripts/release_gate.sh:70:run_check "Capa compatibilidad CAD presente" "test -f app/uchi_cad_compat.lsp"
-./scripts/release_gate.sh:71:run_must_be_empty "Branding legacy visible en UI/mensajes" "rg -n 'CivilCAD-like|civilcad|CivilCAD' app/uchi_ui.lsp app/uchi_commands.lsp app/*.dcl"
-./scripts/release_gate.sh:72:run_check "Referencias de carga/rutas (inventario)" "rg -n --glob '!.git/**' 'main.lsp|APPLOAD|app/|autoload|Support Path|support path|\\(load' . || true"
-./scripts/release_gate.sh:87:append "2. APPLOAD desde instalación objetivo (nueva)."
 ./docs/release/BACKLOG_IMPLEMENTACION.md:4:- Launcher determinista `main.lsp` fuera de `app/`.
 ./docs/release/COMPATIBILIDAD_CAD.md:7:- Capa `app/uchi_cad_compat.lsp` para detección de plataforma y capacidades.
 ./docs/release/COMPATIBILIDAD_CAD.md:22:1. APPLOAD `main.lsp`.
@@ -86,6 +80,12 @@ Resultado: PASS
 ./main.lsp:135:    (progn (load full nil) T)
 ./main.lsp:146:      (uchi:log "ERROR launcher inválido. APPLOAD debe apuntar a main.lsp fuera de app/.")
 ./main.lsp:153:          (uchi:log "ERROR no se pudo resolver app/. Use UCHI_APP_DIR válido o selección manual.")
+./scripts/release_gate.sh:68:run_check "Launcher principal presente" "test -f main.lsp"
+./scripts/release_gate.sh:69:run_check "Launcher no vive dentro de app/" "test ! -f app/main.lsp"
+./scripts/release_gate.sh:70:run_check "Capa compatibilidad CAD presente" "test -f app/uchi_cad_compat.lsp"
+./scripts/release_gate.sh:71:run_must_be_empty "Branding legacy visible en UI/mensajes" "rg -n 'CivilCAD-like|civilcad|CivilCAD' app/uchi_ui.lsp app/uchi_commands.lsp app/*.dcl"
+./scripts/release_gate.sh:72:run_check "Referencias de carga/rutas (inventario)" "rg -n --glob '!.git/**' 'main.lsp|APPLOAD|app/|autoload|Support Path|support path|\\(load' . || true"
+./scripts/release_gate.sh:87:append "2. APPLOAD desde instalación objetivo (nueva)."
 ```
 
 ## Gate de artefactos
