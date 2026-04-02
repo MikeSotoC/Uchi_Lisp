@@ -35,4 +35,20 @@
   (princ)
 )
 
+(defun uchi:apply-template-dg2018 ()
+  ;; Parámetros base referenciales para carretera DG-2018 (ajustables por proyecto)
+  (setenv "UCHI_CFG_ROAD_LANE_WIDTH" "3.60")
+  (setenv "UCHI_CFG_ROAD_LANES" "2")
+  (setenv "UCHI_CFG_ROAD_SHOULDER" "1.80")
+  (setenv "UCHI_CFG_ROAD_CROSSFALL" "2.5")
+  (setenv "UCHI_CFG_PROFILE_HSCALE" "1.0")
+  (setenv "UCHI_CFG_PROFILE_VSCALE" "10.0")
+  (uchi:log "Template DG-2018 Carreteras Perú aplicado (base configurable).")
+)
+
+(defun C:UCHI_TEMPLATE_DG2018 ()
+  (uchi:apply-template-dg2018)
+  (princ)
+)
+
 (princ)

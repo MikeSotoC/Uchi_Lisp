@@ -199,6 +199,10 @@
   (C:UCHI_TEMPLATE_PE)
 )
 
+(defun C:UCHI_TEMPLATE_DG ()
+  (C:UCHI_TEMPLATE_DG2018)
+)
+
 (defun C:TOPO_BASE ()
   ;; Alias legacy.
   (C:UCHI_TOPO)
