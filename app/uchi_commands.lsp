@@ -37,6 +37,12 @@
     ((= action "geojson")
       (C:UCHI_EXPORT_GEOJSON)
     )
+    ((= action "align")
+      (C:UCHI_ALINEAMIENTO)
+    )
+    ((= action "volume")
+      (C:UCHI_VOLUMEN)
+    )
     (T
       (uchi:log "UI cancelada o no disponible.")
     )
@@ -89,6 +95,14 @@
 
 (defun C:UCHI_GEOJSON ()
   (C:UCHI_EXPORT_GEOJSON)
+)
+
+(defun C:UCHI_ALIGN ()
+  (C:UCHI_ALINEAMIENTO)
+)
+
+(defun C:UCHI_VOL ()
+  (C:UCHI_VOLUMEN)
 )
 
 (defun C:TOPO_BASE ()

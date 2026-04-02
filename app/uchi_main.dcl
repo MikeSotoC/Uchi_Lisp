@@ -59,6 +59,16 @@ uchi_main : dialog {
       label = "Exportar GeoJSON";
       is_default = false;
     }
+    : button {
+      key = "build_align";
+      label = "Generar alineamiento";
+      is_default = false;
+    }
+    : button {
+      key = "build_volume";
+      label = "Generar volumen";
+      is_default = false;
+    }
     : spacer {}
     ok_cancel;
   }

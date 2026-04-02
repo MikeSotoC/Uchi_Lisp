@@ -23,7 +23,7 @@
 )
 
 (defun uchi:required-modules ()
-  (list "uchi_cad_compat.lsp" "uchi_core.lsp" "uchi_config.lsp" "uchi_ui.lsp" "uchi_commands.lsp" "uchi_topo.lsp" "uchi_surface.lsp" "uchi_profile.lsp" "uchi_curves.lsp" "uchi_sections.lsp" "uchi_report.lsp" "uchi_engine.lsp")
+  (list "uchi_cad_compat.lsp" "uchi_core.lsp" "uchi_config.lsp" "uchi_ui.lsp" "uchi_commands.lsp" "uchi_topo.lsp" "uchi_surface.lsp" "uchi_profile.lsp" "uchi_curves.lsp" "uchi_sections.lsp" "uchi_report.lsp" "uchi_alignment.lsp" "uchi_volume.lsp" "uchi_engine.lsp")
 )
 
 (defun uchi:launcher-file ()

@@ -19,6 +19,9 @@
       "Área malla: " (rtos (uchi:to-real (uchi:project-get "mesh_area")) 2 2) "\n"
       "Corte: " (rtos (uchi:to-real (uchi:project-get "cut")) 2 2) "\n"
       "Relleno: " (rtos (uchi:to-real (uchi:project-get "fill")) 2 2) "\n"
+      "Longitud alineamiento: " (rtos (uchi:to-real (uchi:project-get "alignment_length")) 2 2) "\n"
+      "Archivo alineamiento: uchi_alignment.csv\n"
+      "Archivo volumen: uchi_volume.csv\n"
     )
   )
   txt

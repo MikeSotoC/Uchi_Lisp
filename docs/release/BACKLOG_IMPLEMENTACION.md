@@ -9,6 +9,7 @@
 - Compatibilidad de comandos legacy (`UCHI_MAIN`, `TOPO_BASE`).
 - Exportación de reporte técnico (`UCHI_REPORTE`).
 - Pipeline integral (`UCHI_PROCESAR`) y exportación GIS (`UCHI_EXPORT_GEOJSON`).
+- Alineamiento y volumen por estación (`UCHI_ALINEAMIENTO`, `UCHI_VOLUMEN`).
 
 ## Falta implementar para release funcional completo
 1. **Puntos**: reglas avanzadas extra (códigos, tolerancias, filtros por capa) y reporte exportable.
