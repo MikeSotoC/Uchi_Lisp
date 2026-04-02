@@ -2,6 +2,16 @@
 
 (setq *uchi-mesh* nil)
 
+(defun uchi:mesh-from-tin-or-strip ()
+  (if (and (fboundp 'uchi:tin-generate) (> (length *uchi-points*) 2))
+    (progn
+      (setq *uchi-tin* (uchi:tin-generate))
+      (if (> (length *uchi-tin*) 0) *uchi-tin* (uchi:build-mesh-strip))
+    )
+    (uchi:build-mesh-strip)
+  )
+)
+
 (defun uchi:sort-points-xy (pts)
   (vl-sort pts
     '(lambda (a b)
@@ -100,12 +110,13 @@
   (if (> (length *uchi-points*) 2)
     (progn
       (C:UCHI_ESTILOS)
-      (setq mesh (uchi:build-mesh-strip))
+      (setq mesh (uchi:mesh-from-tin-or-strip))
       (setq *uchi-mesh* mesh)
       (setq area (uchi:mesh-area-total mesh))
       (setq vol (uchi:volume-cut-fill-mesh mesh))
 
       (uchi:project-set "mesh_triangles" (length mesh))
+      (uchi:project-set "tin_triangles" (length mesh))
       (uchi:project-set "mesh_area" area)
       (uchi:project-set "cut" (cdr (assoc "cut" vol)))
       (uchi:project-set "fill" (cdr (assoc "fill" vol)))

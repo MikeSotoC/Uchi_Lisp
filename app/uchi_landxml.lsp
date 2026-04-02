@@ -5,9 +5,11 @@
 )
 
 (defun uchi:mesh-or-build ()
-  (if (and *uchi-mesh* (> (length *uchi-mesh*) 0))
-    *uchi-mesh*
-    (uchi:build-mesh-strip)
+  (cond
+    ((and *uchi-tin* (> (length *uchi-tin*) 0)) *uchi-tin*)
+    ((and *uchi-mesh* (> (length *uchi-mesh*) 0)) *uchi-mesh*)
+    ((fboundp 'uchi:tin-generate) (uchi:tin-generate))
+    (T (uchi:build-mesh-strip))
   )
 )
 

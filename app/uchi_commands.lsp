@@ -55,6 +55,9 @@
     ((= action "landxml")
       (C:UCHI_EXPORT_LANDXML)
     )
+    ((= action "tin")
+      (C:UCHI_TIN)
+    )
     (T
       (uchi:log "UI cancelada o no disponible.")
     )
@@ -131,6 +134,10 @@
 
 (defun C:UCHI_LXML ()
   (C:UCHI_EXPORT_LANDXML)
+)
+
+(defun C:UCHI_TIN_GEN ()
+  (C:UCHI_TIN)
 )
 
 (defun C:TOPO_BASE ()

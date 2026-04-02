@@ -11,11 +11,11 @@
 - Pipeline integral (`UCHI_PROCESAR`) y exportación GIS (`UCHI_EXPORT_GEOJSON`).
 - Alineamiento y volumen por estación (`UCHI_ALINEAMIENTO`, `UCHI_VOLUMEN`).
 - QC automático y decisión GO/NO-GO (`UCHI_QC`, `UCHI_RELEASE_GO`).
-- Estilos CAD y exportación LandXML base (`UCHI_ESTILOS`, `UCHI_EXPORT_LANDXML`).
+- Estilos CAD, LandXML y TIN base (`UCHI_ESTILOS`, `UCHI_EXPORT_LANDXML`, `UCHI_TIN`).
 
 ## Falta implementar para release funcional completo
 1. **Puntos**: reglas avanzadas extra (códigos, tolerancias, filtros por capa) y reporte exportable.
-2. **Superficie**: reemplazar bbox actual por triangulación/TIN completa y suavizado configurable.
+2. **Superficie**: motor TIN base implementado; falta robustecer con breaklines, límites y suavizado avanzado.
 3. **Curvas**: mejorar calidad geométrica de curvas (actualmente se dibujan líneas base por intervalo).
 4. **Perfiles y secciones**: mejorar plantillas y anotaciones (ya se dibuja perfil/secciones base).
 5. **Persistencia**: migrar de `.dat` a `.uchi.json` con versionado de esquema.

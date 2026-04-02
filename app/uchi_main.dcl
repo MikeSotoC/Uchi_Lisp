@@ -89,6 +89,11 @@ uchi_main : dialog {
       label = "Exportar LandXML";
       is_default = false;
     }
+    : button {
+      key = "build_tin";
+      label = "Generar TIN";
+      is_default = false;
+    }
     : spacer {}
     ok_cancel;
   }

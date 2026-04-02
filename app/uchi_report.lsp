@@ -16,6 +16,7 @@
       "Z min: " (rtos (uchi:to-real (uchi:project-get "z_min")) 2 2) "\n"
       "Z max: " (rtos (uchi:to-real (uchi:project-get "z_max")) 2 2) "\n"
       "Triángulos malla: " (itoa (atoi (vl-princ-to-string (uchi:project-get "mesh_triangles")))) "\n"
+      "Triángulos TIN: " (itoa (atoi (vl-princ-to-string (uchi:project-get "tin_triangles")))) "\n"
       "Área malla: " (rtos (uchi:to-real (uchi:project-get "mesh_area")) 2 2) "\n"
       "Corte: " (rtos (uchi:to-real (uchi:project-get "cut")) 2 2) "\n"
       "Relleno: " (rtos (uchi:to-real (uchi:project-get "fill")) 2 2) "\n"

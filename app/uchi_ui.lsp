@@ -30,6 +30,7 @@
           (action_tile "run_release" "(setq action \"release\") (done_dialog 1)")
           (action_tile "run_styles" "(setq action \"styles\") (done_dialog 1)")
           (action_tile "export_landxml" "(setq action \"landxml\") (done_dialog 1)")
+          (action_tile "build_tin" "(setq action \"tin\") (done_dialog 1)")
           (action_tile "accept" "(setq action \"ok\") (done_dialog 1)")
           (action_tile "cancel" "(setq action \"cancel\") (done_dialog 0)")
           (start_dialog)
