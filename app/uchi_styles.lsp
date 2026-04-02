@@ -6,6 +6,7 @@
     (list "UCHI_SURFACE" 2)
     (list "UCHI_PROFILE" 4)
     (list "UCHI_CURVES" 5)
+    (list "UCHI_CURVES_MAJOR" 30)
     (list "UCHI_SECTIONS" 6)
     (list "UCHI_BOUNDARY" 1)
   )

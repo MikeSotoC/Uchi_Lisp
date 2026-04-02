@@ -16,7 +16,7 @@
 ## Falta implementar para release funcional completo
 1. **Puntos**: reglas avanzadas extra (códigos, tolerancias, filtros por capa) y reporte exportable.
 2. **Superficie**: TIN ahora considera breaklines hard importables y validación de cruce de segmentos; falta robustecer con límites complejos (huecos/islas), algoritmo Delaunay completo y suavizado avanzado.
-3. **Curvas**: mejorar calidad geométrica de curvas (actualmente se dibujan líneas base por intervalo).
+3. **Curvas**: ahora se generan por intersección de niveles sobre TIN (segmentos reales por triángulo); falta encadenado/suavizado topológico y etiquetado avanzado de producción.
 4. **Perfiles y secciones**: mejorar plantillas y anotaciones (ya se dibuja perfil/secciones base).
 5. **Persistencia**: migrar de `.dat` a `.uchi.json` con versionado de esquema.
 6. **QA CAD real**: matriz por versión de AutoCAD y ZWCAD con evidencias.
