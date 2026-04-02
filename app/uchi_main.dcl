@@ -44,6 +44,11 @@ uchi_main : dialog {
       label = "Generar secciones";
       is_default = false;
     }
+    : button {
+      key = "export_report";
+      label = "Exportar reporte";
+      is_default = false;
+    }
     : spacer {}
     ok_cancel;
   }

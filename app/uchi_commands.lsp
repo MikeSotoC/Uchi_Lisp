@@ -28,6 +28,9 @@
     ((= action "sections")
       (C:UCHI_SECCIONES)
     )
+    ((= action "report")
+      (C:UCHI_REPORTE)
+    )
     (T
       (uchi:log "UI cancelada o no disponible.")
     )
@@ -68,6 +71,10 @@
 
 (defun C:UCHI_SEC ()
   (C:UCHI_SECCIONES)
+)
+
+(defun C:UCHI_RPT ()
+  (C:UCHI_REPORTE)
 )
 
 (defun C:TOPO_BASE ()

@@ -7,6 +7,7 @@
 - UI base UCHI y flujo topográfico base (`UCHI_FLUJO`).
 - Importación y validación inicial de puntos CSV (`UCHI_PUNTOS_IMPORT`/`UCHI_VALIDAR_PUNTOS`) con persistencia de proyecto.
 - Compatibilidad de comandos legacy (`UCHI_MAIN`, `TOPO_BASE`).
+- Exportación de reporte técnico (`UCHI_REPORTE`).
 
 ## Falta implementar para release funcional completo
 1. **Puntos**: reglas avanzadas extra (códigos, tolerancias, filtros por capa) y reporte exportable.
