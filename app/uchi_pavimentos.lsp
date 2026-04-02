@@ -1,0 +1,32 @@
+;;; UCHI Pavimentos (metrados base)
+
+(defun uchi:pav-width () (uchi:to-real (or (getenv "UCHI_CFG_ROAD_PLATFORM_WIDTH") 10.8)))
+(defun uchi:pav-th-base () (uchi:to-real (or (getenv "UCHI_CFG_PAV_BASE_M") 0.20)))
+(defun uchi:pav-th-subbase () (uchi:to-real (or (getenv "UCHI_CFG_PAV_SUBBASE_M") 0.20)))
+(defun uchi:pav-th-asphalt () (uchi:to-real (or (getenv "UCHI_CFG_PAV_AC_M") 0.05)))
+
+(defun C:UCHI_PAVIMENTOS (/ l w path fp a v1 v2 v3)
+  (uchi:topo-init)
+  (setq l (if (fboundp 'uchi:profile-length) (uchi:profile-length) 0.0))
+  (setq w (uchi:pav-width))
+  (setq a (* l w))
+  (setq v1 (* a (uchi:pav-th-subbase)))
+  (setq v2 (* a (uchi:pav-th-base)))
+  (setq v3 (* a (uchi:pav-th-asphalt)))
+  (setq path (strcat (uchi:launcher-dir-safe) "/uchi_pavimentos.csv"))
+  (setq fp (open path "w"))
+  (if fp
+    (progn
+      (write-line "area_m2,subbase_m3,base_m3,asfalto_m3" fp)
+      (write-line (strcat (rtos a 2 2) "," (rtos v1 2 2) "," (rtos v2 2 2) "," (rtos v3 2 2)) fp)
+      (close fp)
+      (uchi:project-set "pav_area" a)
+      (uchi:project-save)
+      (uchi:log "Pavimentos base exportado: uchi_pavimentos.csv")
+    )
+    (uchi:log "ERROR al exportar pavimentos.")
+  )
+  (princ)
+)
+
+(princ)

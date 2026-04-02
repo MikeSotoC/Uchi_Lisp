@@ -1,0 +1,27 @@
+;;; UCHI Expediente técnico (resumen base)
+
+(defun C:UCHI_EXPEDIENTE (/ path fp)
+  (uchi:topo-init)
+  (setq path (strcat (uchi:launcher-dir-safe) "/uchi_expediente.txt"))
+  (setq fp (open path "w"))
+  (if fp
+    (progn
+      (write-line "UCHI - Expediente técnico (resumen automático)" fp)
+      (write-line "============================================" fp)
+      (write-line (strcat "Proyecto: " (uchi:project-get "name")) fp)
+      (write-line (strcat "Puntos: " (vl-princ-to-string (uchi:project-get "points_count"))) fp)
+      (write-line (strcat "TIN triángulos: " (vl-princ-to-string (uchi:project-get "tin_triangles"))) fp)
+      (write-line (strcat "Subdivisión lotes: " (vl-princ-to-string (uchi:project-get "subdivision_lots"))) fp)
+      (write-line (strcat "Volumen corte: " (vl-princ-to-string (uchi:project-get "cut"))) fp)
+      (write-line (strcat "Volumen relleno: " (vl-princ-to-string (uchi:project-get "fill"))) fp)
+      (write-line (strcat "Interferencias: " (vl-princ-to-string (uchi:project-get "interf_count"))) fp)
+      (write-line "Archivos esperados: uchi_surface.xml, uchi_report.txt, uchi_subdivision.csv, uchi_redes.csv" fp)
+      (close fp)
+      (uchi:log "Expediente técnico generado: uchi_expediente.txt")
+    )
+    (uchi:log "ERROR al generar expediente.")
+  )
+  (princ)
+)
+
+(princ)
