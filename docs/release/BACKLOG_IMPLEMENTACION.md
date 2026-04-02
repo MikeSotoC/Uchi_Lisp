@@ -31,10 +31,10 @@
 14. **Organización de módulos**: `UCHI_MODULOS` implementado para inventario funcional por dominio; falta autogenerar documentación técnica desde registry.
 
 ## Módulos aún faltantes para objetivo “producto final”
-15. **Hidrología/Hidráulica**: módulo base implementado (`UCHI_HIDRAULICA`, método racional). Falta dimensionamiento hidráulico completo por norma.
+15. **Hidrología/Hidráulica**: módulo base implementado (`UCHI_HIDRAULICA`, método racional + diámetro sugerido por Manning). Falta dimensionamiento hidráulico completo por norma.
 16. **Pavimentos**: módulo base implementado (`UCHI_PAVIMENTOS`, metrados por capas). Falta diseño estructural por tránsito/material.
-17. **Interferencias 3D**: módulo base implementado (`UCHI_INTERFERENCIAS`, detección por umbral). Falta motor espacial robusto y severidad.
-18. **Expediente técnico**: módulo base implementado (`UCHI_EXPEDIENTE`, resumen automático). Falta armado completo de planos/cuadros normativos finales.
+17. **Interferencias 3D**: módulo base implementado (`UCHI_INTERFERENCIAS`, detección por umbral + severidad). Falta motor espacial robusto por corredor 3D.
+18. **Expediente técnico**: módulo base implementado (`UCHI_EXPEDIENTE`, resumen + estado de archivos). Falta armado completo de planos/cuadros normativos finales.
 
 ## Criterio para “parecerse a CivilCAD” sin copiar
 - Misma intención de flujo topográfico de alto nivel (proyecto -> puntos -> superficie/curvas -> perfil).

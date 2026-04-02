@@ -1,6 +1,6 @@
 # UCHI — Reporte de Gate de Release
 
-Fecha: 2026-04-02 08:03:01 UTC
+Fecha: 2026-04-02 08:08:25 UTC
 
 ## Contexto
 Este gate prioriza estabilidad de producción y bloquea release cuando faltan artefactos críticos.

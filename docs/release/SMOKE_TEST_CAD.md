@@ -44,9 +44,9 @@ Validar carga estable por APPLOAD, comandos base y aislamiento de ruta activa.
 34. Ejecutar `UCHI_SUBDIV` y verificar `uchi_subdivision.csv` (type `lot/lot_corner/road/aporte`), con modo por `SUBDIV_COLS/ROWS` o por `SUBDIV_NDIV`, filtro por boundary irregular, frente mínimo y `uchi_subdivision_summary.csv` con cuadro de áreas.
 35. Ejecutar `UCHI_MODULOS` y validar inventario por dominios en logs.
 36. Ejecutar `UCHI_REDES_PE` y verificar `uchi_redes.csv` con `AGUA/DESAGUE`, `BZ` y accesorios.
-37. Ejecutar `UCHI_HIDRO` y verificar `uchi_hidraulica.csv` con `Q_lps`.
+37. Ejecutar `UCHI_HIDRO` y verificar `uchi_hidraulica.csv` con `Q_lps` y `D_sugerido_mm`.
 38. Ejecutar `UCHI_PAV` y verificar `uchi_pavimentos.csv` con metrados por capa.
-39. Ejecutar `UCHI_INTERF` y verificar `uchi_interferencias.csv` con cruces detectados.
+39. Ejecutar `UCHI_INTERF` y verificar `uchi_interferencias.csv` con cruces detectados y `severidad`.
 40. Ejecutar `UCHI_EXP` y verificar `uchi_expediente.txt`.
 41. Ejecutar `UCHI_ROAD` y validar dibujo de secciones tipo en capa `UCHI_ROAD`.
 42. Ejecutar `UCHI_EXPORT_LANDXML` y verificar `uchi_surface.xml` con caras `<Faces>`.

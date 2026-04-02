@@ -1,6 +1,14 @@
 ;;; UCHI Interferencias 3D (base redes)
 
 (defun uchi:interf-th () (uchi:to-real (or (getenv "UCHI_CFG_INTERF_TH_M") 1.5)))
+(defun uchi:interf-sev (d)
+  (cond
+    ((< d 0.50) "CRITICA")
+    ((< d 1.00) "ALTA")
+    ((< d 1.50) "MEDIA")
+    (T "BAJA")
+  )
+)
 
 (defun uchi:read-redes-csv (/ path lines out cols)
   (setq path (strcat (uchi:launcher-dir-safe) "/uchi_redes.csv"))
@@ -16,7 +24,7 @@
   out
 )
 
-(defun C:UCHI_INTERFERENCIAS (/ rows a b d th path fp c)
+(defun C:UCHI_INTERFERENCIAS (/ rows a b d th path fp c key seen)
   (uchi:topo-init)
   (setq rows (uchi:read-redes-csv))
   (setq th (uchi:interf-th))
@@ -24,19 +32,26 @@
   (setq fp (open path "w"))
   (if fp
     (progn
-      (write-line "red_a,bz_a,red_b,bz_b,dist_3d" fp)
-      (setq c 0)
+      (write-line "red_a,bz_a,red_b,bz_b,dist_3d,severidad" fp)
+      (setq c 0 seen nil)
       (foreach a rows
         (foreach b rows
           (if (and (/= (nth 4 a) (nth 4 b))
-                   (/= (nth 1 a) (nth 1 b)))
+                   (/= (nth 1 a) (nth 1 b))
+                   (< (vl-string-compare (nth 4 a) (nth 4 b)) 0))
             (progn
               (setq d (distance (list (atof (nth 5 a)) (atof (nth 6 a)) (atof (nth 7 a)))
                                (list (atof (nth 5 b)) (atof (nth 6 b)) (atof (nth 7 b)))))
               (if (< d th)
                 (progn
-                  (write-line (strcat (nth 1 a) "," (nth 4 a) "," (nth 1 b) "," (nth 4 b) "," (rtos d 2 3)) fp)
-                  (setq c (+ c 1))
+                  (setq key (strcat (nth 4 a) "|" (nth 4 b)))
+                  (if (not (assoc key seen))
+                    (progn
+                      (write-line (strcat (nth 1 a) "," (nth 4 a) "," (nth 1 b) "," (nth 4 b) "," (rtos d 2 3) "," (uchi:interf-sev d)) fp)
+                      (setq c (+ c 1))
+                      (setq seen (cons (cons key T) seen))
+                    )
+                  )
                 )
               )
             )
