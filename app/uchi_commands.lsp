@@ -159,6 +159,14 @@
   (C:UCHI_SAVE_JSON)
 )
 
+(defun C:UCHI_STAKE ()
+  (C:UCHI_STAKEOUT)
+)
+
+(defun C:UCHI_REPLANTEO ()
+  (C:UCHI_STAKEOUT)
+)
+
 (defun C:TOPO_BASE ()
   ;; Alias legacy.
   (C:UCHI_TOPO)
