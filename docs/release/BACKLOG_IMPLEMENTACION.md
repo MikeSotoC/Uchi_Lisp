@@ -25,7 +25,7 @@
 9. **Replanteo**: módulo base `UCHI_STAKEOUT` implementado (puntos pk/offset y CSV); falta integrar catálogo de códigos y salida para estación total/GNSS.
 10. **Drenaje/Cunetas**: módulo base `UCHI_DRENAJE` implementado (longitudinal/transversal + CSV); falta cálculo hidráulico y validaciones normativas de pendiente mínima.
 11. **Catastro**: módulos base urbano (`UCHI_CATASTRO`) y rural (`UCHI_CATASTRO_RURAL`) implementados (lotes/predios y CSV); falta integración con nomenclatura oficial y validación SUNARP/Municipal.
-11.1 **Subdivisión**: módulo `UCHI_SUBDIVISION` ya usa boundary (polígono irregular), reserva vial orientada (`ROAD_EVERY` + `ROAD_ANGLE`) y filtros de área mínima; falta reglas municipales avanzadas (frentes mínimos, aportes y equipamiento).
+11.1 **Subdivisión**: módulo `UCHI_SUBDIVISION` ya usa boundary (polígono irregular), reserva vial orientada (`ROAD_EVERY` + `ROAD_ANGLE`), frente mínimo y aportes reglamentarios con cuadro de áreas automático; falta reglas municipales avanzadas de equipamiento y casuística urbana especial.
 12. **Redes agua/desagüe**: módulo base `UCHI_REDES` implementado (BZ/accesorios, pendiente y diámetros por template); falta cálculo hidráulico detallado y conflictos 3D.
 13. **Carreteras**: módulo base `UCHI_CARRETERA` implementado (secciones tipo y parámetros de plantilla) + template `DG-2018` configurable; falta peraltes, sobreanchos y chequeos de norma MTC completos.
 14. **Organización de módulos**: `UCHI_MODULOS` implementado para inventario funcional por dominio; falta autogenerar documentación técnica desde registry.

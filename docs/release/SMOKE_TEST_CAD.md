@@ -36,20 +36,21 @@ Validar carga estable por APPLOAD, comandos base y aislamiento de ruta activa.
 26. Ejecutar `UCHI_JSON` y verificar `uchi_project.uchi.json` con `schema_version`.
 27. Ejecutar `UCHI_STAKEOUT` (o `UCHI_REPLANTEO`) y verificar `uchi_stakeout.csv` con columnas `pk,offset,x,y,z`.
 28. Ejecutar `UCHI_DRENAJE` (o `UCHI_CUNETAS`) y verificar `uchi_drainage.csv` con segmentos `long_*`/`trans_*`.
-29. Ejecutar `UCHI_TEMPLATE` (Perú) y confirmar variables base de carreteras/redes/catastro.
-30. Ejecutar `UCHI_TEMPLATE_DG` y confirmar parámetros DG-2018 de carretera.
-31. Ejecutar `UCHI_CATASTRO` y verificar `uchi_catastro.csv` con lotes.
-32. Ejecutar `UCHI_CATASTRO_RUR` y verificar `uchi_catastro_rural.csv` con `area_m2/area_ha`.
-33. Ejecutar `UCHI_SUBDIV` y verificar `uchi_subdivision.csv` (type lot/road, row/col/area), filtro por boundary irregular, vialidad orientada y anotaciones en lotes.
-34. Ejecutar `UCHI_MODULOS` y validar inventario por dominios en logs.
-35. Ejecutar `UCHI_REDES_PE` y verificar `uchi_redes.csv` con `AGUA/DESAGUE`, `BZ` y accesorios.
-36. Ejecutar `UCHI_ROAD` y validar dibujo de secciones tipo en capa `UCHI_ROAD`.
-37. Ejecutar `UCHI_EXPORT_LANDXML` y verificar `uchi_surface.xml` con caras `<Faces>`.
-38. Ejecutar `UCHI_DIAG` y validar launcher/appdir en logs.
-39. Revisar logs `[UCHI] Flujo topográfico base iniciado/completado`.
-40. Forzar fallback: mover temporalmente módulos de A y dejar `UCHI_APP_DIR` a B.
-41. Verificar que el sistema anuncia fallback usado y ruta final activa.
-42. Restaurar módulos y repetir APPLOAD en A.
+29. Verificar archivos externos `templates/pe_generic.tpl` y `templates/pe_dg2018.tpl`.
+30. Ejecutar `UCHI_TEMPLATE` (Perú) y confirmar variables base de carreteras/redes/catastro.
+31. Ejecutar `UCHI_TEMPLATE_DG` y confirmar parámetros DG-2018 de carretera.
+32. Ejecutar `UCHI_CATASTRO` y verificar `uchi_catastro.csv` con lotes.
+33. Ejecutar `UCHI_CATASTRO_RUR` y verificar `uchi_catastro_rural.csv` con `area_m2/area_ha`.
+34. Ejecutar `UCHI_SUBDIV` y verificar `uchi_subdivision.csv` (type `lot/lot_corner/road/aporte`), filtro por boundary irregular, frente mínimo y `uchi_subdivision_summary.csv` con cuadro de áreas.
+35. Ejecutar `UCHI_MODULOS` y validar inventario por dominios en logs.
+36. Ejecutar `UCHI_REDES_PE` y verificar `uchi_redes.csv` con `AGUA/DESAGUE`, `BZ` y accesorios.
+37. Ejecutar `UCHI_ROAD` y validar dibujo de secciones tipo en capa `UCHI_ROAD`.
+38. Ejecutar `UCHI_EXPORT_LANDXML` y verificar `uchi_surface.xml` con caras `<Faces>`.
+39. Ejecutar `UCHI_DIAG` y validar launcher/appdir en logs.
+40. Revisar logs `[UCHI] Flujo topográfico base iniciado/completado`.
+41. Forzar fallback: mover temporalmente módulos de A y dejar `UCHI_APP_DIR` a B.
+42. Verificar que el sistema anuncia fallback usado y ruta final activa.
+43. Restaurar módulos y repetir APPLOAD en A.
 
 ## Criterio GO
 - No hay mezcla de `app/` entre instalaciones.

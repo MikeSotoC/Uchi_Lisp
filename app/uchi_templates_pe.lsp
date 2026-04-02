@@ -1,33 +1,44 @@
 ;;; UCHI Templates Perú (configuración base)
 
+(defun uchi:template-file-path (name)
+  (strcat (uchi:launcher-dir-safe) "/templates/" name ".tpl")
+)
+
+(defun uchi:template-apply-kv-line (line / pos k v)
+  (if (and line (> (strlen line) 0) (/= (substr line 1 1) "#"))
+    (progn
+      (setq pos (vl-string-search "=" line))
+      (if pos
+        (progn
+          (setq k (substr line 1 pos))
+          (setq v (substr line (+ pos 2)))
+          (if (wcmatch (strcase k) "UCHI_CFG_*")
+            (setenv k v)
+          )
+        )
+      )
+    )
+  )
+)
+
+(defun uchi:apply-template-file (name / path lines ln)
+  (setq path (uchi:template-file-path name))
+  (if (findfile path)
+    (progn
+      (setq lines (uchi:read-lines path))
+      (foreach ln lines (uchi:template-apply-kv-line ln))
+      (uchi:log (strcat "Template aplicado desde archivo: " path))
+      T
+    )
+    (progn
+      (uchi:log (strcat "Template no encontrado: " path))
+      nil
+    )
+  )
+)
+
 (defun uchi:apply-template-pe-generic ()
-  ;; Topografía
-  (setenv "UCHI_CFG_CURVE_MAJOR" "5")
-  (setenv "UCHI_CFG_CURVE_MINOR" "1")
-  (setenv "UCHI_CFG_PROFILE_HSCALE" "1.0")
-  (setenv "UCHI_CFG_PROFILE_VSCALE" "10.0")
-  ;; Carreteras
-  (setenv "UCHI_CFG_ROAD_LANE_WIDTH" "3.30")
-  (setenv "UCHI_CFG_ROAD_LANES" "2")
-  (setenv "UCHI_CFG_ROAD_SHOULDER" "1.20")
-  (setenv "UCHI_CFG_ROAD_CROSSFALL" "2.0")
-  ;; Agua / desagüe
-  (setenv "UCHI_CFG_WATER_DIAM_MM" "110")
-  (setenv "UCHI_CFG_WATER_SLOPE_PCT" "0.5")
-  (setenv "UCHI_CFG_SEWER_DIAM_MM" "200")
-  (setenv "UCHI_CFG_SEWER_SLOPE_PCT" "1.0")
-  (setenv "UCHI_CFG_BZ_SPACING" "60")
-  ;; Catastro
-  (setenv "UCHI_CFG_CATASTRO_LOT_W" "8")
-  (setenv "UCHI_CFG_CATASTRO_LOT_D" "20")
-  (setenv "UCHI_CFG_RURAL_FRONT" "60")
-  (setenv "UCHI_CFG_RURAL_DEPTH" "200")
-  (setenv "UCHI_CFG_RURAL_USE" "AGRICOLA")
-  (setenv "UCHI_CFG_SUBDIV_COLS" "6")
-  (setenv "UCHI_CFG_SUBDIV_ROWS" "6")
-  (setenv "UCHI_CFG_SUBDIV_ROAD_EVERY" "3")
-  (setenv "UCHI_CFG_SUBDIV_MIN_AREA" "80")
-  (uchi:log "Template Perú aplicado (topo + carreteras + saneamiento + catastro).")
+  (uchi:apply-template-file "pe_generic")
 )
 
 (defun C:UCHI_TEMPLATE_PE ()
@@ -36,14 +47,7 @@
 )
 
 (defun uchi:apply-template-dg2018 ()
-  ;; Parámetros base referenciales para carretera DG-2018 (ajustables por proyecto)
-  (setenv "UCHI_CFG_ROAD_LANE_WIDTH" "3.60")
-  (setenv "UCHI_CFG_ROAD_LANES" "2")
-  (setenv "UCHI_CFG_ROAD_SHOULDER" "1.80")
-  (setenv "UCHI_CFG_ROAD_CROSSFALL" "2.5")
-  (setenv "UCHI_CFG_PROFILE_HSCALE" "1.0")
-  (setenv "UCHI_CFG_PROFILE_VSCALE" "10.0")
-  (uchi:log "Template DG-2018 Carreteras Perú aplicado (base configurable).")
+  (uchi:apply-template-file "pe_dg2018")
 )
 
 (defun C:UCHI_TEMPLATE_DG2018 ()
