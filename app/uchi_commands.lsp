@@ -175,6 +175,22 @@
   (C:UCHI_DRENAJE)
 )
 
+(defun C:UCHI_CATASTRO_GEN ()
+  (C:UCHI_CATASTRO)
+)
+
+(defun C:UCHI_REDES_PE ()
+  (C:UCHI_REDES)
+)
+
+(defun C:UCHI_ROAD ()
+  (C:UCHI_CARRETERA)
+)
+
+(defun C:UCHI_TEMPLATE ()
+  (C:UCHI_TEMPLATE_PE)
+)
+
 (defun C:TOPO_BASE ()
   ;; Alias legacy.
   (C:UCHI_TOPO)

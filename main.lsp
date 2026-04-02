@@ -23,7 +23,7 @@
 )
 
 (defun uchi:required-modules ()
-  (list "uchi_cad_compat.lsp" "uchi_core.lsp" "uchi_config.lsp" "uchi_ui.lsp" "uchi_commands.lsp" "uchi_topo.lsp" "uchi_persistence.lsp" "uchi_surface.lsp" "uchi_profile.lsp" "uchi_curves.lsp" "uchi_sections.lsp" "uchi_stakeout.lsp" "uchi_drainage.lsp" "uchi_report.lsp" "uchi_alignment.lsp" "uchi_volume.lsp" "uchi_qc.lsp" "uchi_styles.lsp" "uchi_landxml.lsp" "uchi_boundary.lsp" "uchi_tin.lsp" "uchi_engine.lsp")
+  (list "uchi_cad_compat.lsp" "uchi_core.lsp" "uchi_config.lsp" "uchi_ui.lsp" "uchi_commands.lsp" "uchi_topo.lsp" "uchi_persistence.lsp" "uchi_templates_pe.lsp" "uchi_surface.lsp" "uchi_profile.lsp" "uchi_curves.lsp" "uchi_sections.lsp" "uchi_stakeout.lsp" "uchi_drainage.lsp" "uchi_catastro.lsp" "uchi_utilidades.lsp" "uchi_carreteras.lsp" "uchi_report.lsp" "uchi_alignment.lsp" "uchi_volume.lsp" "uchi_qc.lsp" "uchi_styles.lsp" "uchi_landxml.lsp" "uchi_boundary.lsp" "uchi_tin.lsp" "uchi_engine.lsp")
 )
 
 (defun uchi:launcher-file ()
