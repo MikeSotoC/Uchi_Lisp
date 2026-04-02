@@ -167,6 +167,14 @@
   (C:UCHI_STAKEOUT)
 )
 
+(defun C:UCHI_DRENAJE_GEN ()
+  (C:UCHI_DRENAJE)
+)
+
+(defun C:UCHI_CUNETAS ()
+  (C:UCHI_DRENAJE)
+)
+
 (defun C:TOPO_BASE ()
   ;; Alias legacy.
   (C:UCHI_TOPO)

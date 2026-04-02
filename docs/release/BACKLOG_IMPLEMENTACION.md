@@ -23,6 +23,7 @@
 7. **Telemetría soporte**: log a archivo con rotación (además de consola `[UCHI]`).
 8. **Migrador legacy**: asistente para mapear configuraciones antiguas a esquema UCHI.
 9. **Replanteo**: módulo base `UCHI_STAKEOUT` implementado (puntos pk/offset y CSV); falta integrar catálogo de códigos y salida para estación total/GNSS.
+10. **Drenaje/Cunetas**: módulo base `UCHI_DRENAJE` implementado (longitudinal/transversal + CSV); falta cálculo hidráulico y validaciones normativas de pendiente mínima.
 
 ## Criterio para “parecerse a CivilCAD” sin copiar
 - Misma intención de flujo topográfico de alto nivel (proyecto -> puntos -> superficie/curvas -> perfil).

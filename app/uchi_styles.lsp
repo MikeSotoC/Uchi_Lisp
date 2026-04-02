@@ -10,6 +10,7 @@
     (list "UCHI_CURVES_MAJOR" 30)
     (list "UCHI_SECTIONS" 6)
     (list "UCHI_STAKEOUT" 140)
+    (list "UCHI_DRAINAGE" 151)
     (list "UCHI_BOUNDARY" 1)
   )
 )
