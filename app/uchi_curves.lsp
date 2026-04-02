@@ -1,0 +1,211 @@
+;;; UCHI Curves routines
+
+(defun uchi:curve-major-interval () (max 1 (atoi (vl-princ-to-string (or (getenv "UCHI_CFG_CURVE_MAJOR") 5)))))
+(defun uchi:curve-minor-interval () (max 1 (atoi (vl-princ-to-string (or (getenv "UCHI_CFG_CURVE_MINOR") 1)))))
+(defun uchi:curve-ready-p () (> (length *uchi-points*) 2))
+
+(defun uchi:curve-count (zmin zmax step / c z)
+  (setq c 0 z zmin)
+  (while (<= z zmax) (setq c (+ c 1) z (+ z step)))
+  c
+)
+
+(defun uchi:edge-intersection-at-z (p1 p2 z / z1 z2 t x y)
+  (setq z1 (nth 3 p1) z2 (nth 3 p2))
+  (if (and (/= z1 z2)
+           (<= (min z1 z2) z)
+           (<= z (max z1 z2)))
+    (progn
+      (setq t (/ (- z z1) (- z2 z1)))
+      (setq x (+ (cadr p1) (* t (- (cadr p2) (cadr p1)))))
+      (setq y (+ (caddr p1) (* t (- (caddr p2) (caddr p1)))))
+      (list x y)
+    )
+    nil
+  )
+)
+
+(defun uchi:triangle-contour-segment (tri z / p1 p2 p3 i1 i2 i3 pts)
+  (setq p1 (car tri) p2 (cadr tri) p3 (caddr tri))
+  (setq i1 (uchi:edge-intersection-at-z p1 p2 z))
+  (setq i2 (uchi:edge-intersection-at-z p2 p3 z))
+  (setq i3 (uchi:edge-intersection-at-z p3 p1 z))
+  (setq pts nil)
+  (if i1 (setq pts (append pts (list i1))))
+  (if i2 (setq pts (append pts (list i2))))
+  (if i3 (setq pts (append pts (list i3))))
+  (if (= (length pts) 2) pts nil)
+)
+
+(defun uchi:curve-layer-for-z (z major minor)
+  (if (= 0 (rem (fix (* 1000.0 z)) (max 1 (fix (* 1000.0 major)))))
+    "UCHI_CURVES_MAJOR"
+    "UCHI_CURVES"
+  )
+)
+
+(defun uchi:curve-join-tolerance ()
+  (max 0.001 (uchi:to-real (or (getenv "UCHI_CFG_CURVE_JOIN_TOL") 0.5)))
+)
+
+(defun uchi:xy-dist (a b / dx dy)
+  (setq dx (- (car b) (car a)))
+  (setq dy (- (cadr b) (cadr a)))
+  (sqrt (+ (* dx dx) (* dy dy)))
+)
+
+(defun uchi:segment-valid-p (s tol)
+  (> (uchi:xy-dist (car s) (cadr s)) (* 0.5 tol))
+)
+
+(defun uchi:segment-chain-build (segments tol / chain rest s p0 p1 changed)
+  (if (not segments)
+    nil
+    (progn
+      (setq s (car segments))
+      (setq chain (list (car s) (cadr s)))
+      (setq rest (cdr segments))
+      (setq changed T)
+      (while changed
+        (setq changed nil)
+        (foreach s rest
+          (setq p0 (car chain))
+          (setq p1 (car (reverse chain)))
+          (cond
+            ((<= (uchi:xy-dist (car s) p1) tol)
+              (setq chain (append chain (list (cadr s))))
+              (setq rest (vl-remove s rest))
+              (setq changed T)
+            )
+            ((<= (uchi:xy-dist (cadr s) p1) tol)
+              (setq chain (append chain (list (car s))))
+              (setq rest (vl-remove s rest))
+              (setq changed T)
+            )
+            ((<= (uchi:xy-dist (cadr s) p0) tol)
+              (setq chain (append (list (car s)) chain))
+              (setq rest (vl-remove s rest))
+              (setq changed T)
+            )
+            ((<= (uchi:xy-dist (car s) p0) tol)
+              (setq chain (append (list (cadr s)) chain))
+              (setq rest (vl-remove s rest))
+              (setq changed T)
+            )
+          )
+        )
+      )
+      (list chain rest)
+    )
+  )
+)
+
+(defun uchi:segments->polylines (segments tol / pol out)
+  (setq out nil)
+  (setq segments (vl-remove-if-not '(lambda (s) (uchi:segment-valid-p s tol)) segments))
+  (while segments
+    (setq pol (uchi:segment-chain-build segments tol))
+    (setq out (append out (list (car pol))))
+    (setq segments (cadr pol))
+  )
+  out
+)
+
+(defun uchi:polyline-dedupe (pts tol / out p lastp)
+  (setq out nil lastp nil)
+  (foreach p pts
+    (if (or (not lastp) (> (uchi:xy-dist p lastp) (* 0.25 tol)))
+      (progn
+        (setq out (append out (list p)))
+        (setq lastp p)
+      )
+    )
+  )
+  out
+)
+
+(defun uchi:polyline-close-if-loop (pts tol / p0 p1)
+  (if (> (length pts) 2)
+    (progn
+      (setq p0 (car pts) p1 (car (reverse pts)))
+      (if (<= (uchi:xy-dist p0 p1) tol)
+        (append pts (list p0))
+        pts
+      )
+    )
+    pts
+  )
+)
+
+(defun uchi:smooth-polyline (pts / out i a b q r)
+  (if (< (length pts) 4)
+    pts
+    (progn
+      (setq out (list (car pts)))
+      (setq i 0)
+      (while (< (+ i 1) (length pts))
+        (setq a (nth i pts))
+        (setq b (nth (+ i 1) pts))
+        (setq q (list (+ (* 0.75 (car a)) (* 0.25 (car b)))
+                      (+ (* 0.75 (cadr a)) (* 0.25 (cadr b)))))
+        (setq r (list (+ (* 0.25 (car a)) (* 0.75 (car b)))
+                      (+ (* 0.25 (cadr a)) (* 0.75 (cadr b)))))
+        (setq out (append out (list q r)))
+        (setq i (+ i 1))
+      )
+      (append out (list (car (reverse pts))))
+    )
+  )
+)
+
+(defun uchi:draw-contours-from-mesh (mesh zmin zmax step major / z tri seg count layer segs pls tol pl)
+  (setq z zmin count 0 tol (uchi:curve-join-tolerance))
+  (while (<= z zmax)
+    (setq segs nil)
+    (foreach tri mesh
+      (setq seg (uchi:triangle-contour-segment tri z))
+      (if seg
+        (setq segs (append segs (list seg)))
+      )
+    )
+    (setq layer (uchi:curve-layer-for-z z major step))
+    (setq pls (uchi:segments->polylines segs tol))
+    (foreach pl pls
+      (setq pl (uchi:polyline-dedupe pl tol))
+      (setq pl (uchi:smooth-polyline pl))
+      (setq pl (uchi:polyline-close-if-loop pl tol))
+      (if (> (length pl) 1)
+        (progn
+          (uchi:draw-polyline-2d pl layer)
+          (setq count (+ count 1))
+        )
+      )
+    )
+    (setq z (+ z step))
+  )
+  count
+)
+
+(defun C:UCHI_CURVAS_GEN (/ zmin zmax cmj cmn nmaj nmin mesh segs)
+  (uchi:topo-init)
+  (if (uchi:curve-ready-p)
+    (progn
+      (setq zmin (uchi:to-real (uchi:project-get "z_min")))
+      (setq zmax (uchi:to-real (uchi:project-get "z_max")))
+      (setq cmj (uchi:curve-major-interval) cmn (uchi:curve-minor-interval))
+      (setq nmaj (uchi:curve-count zmin zmax cmj) nmin (uchi:curve-count zmin zmax cmn))
+      (C:UCHI_ESTILOS)
+      (setq mesh (uchi:mesh-from-tin-or-strip))
+      (setq segs (uchi:draw-contours-from-mesh mesh zmin zmax cmn cmj))
+      (uchi:project-set "curves_minor" nmin)
+      (uchi:project-set "curves_major" nmaj)
+      (uchi:project-set "curves_segments" segs)
+      (uchi:project-save)
+      (uchi:log (strcat "Curvas TIN: segmentos=" (itoa segs) ", menores=" (itoa nmin) ", mayores=" (itoa nmaj)))
+    )
+    (uchi:log "Curvas: se requieren al menos 3 puntos válidos.")
+  )
+  (princ)
+)
+
+(princ)
