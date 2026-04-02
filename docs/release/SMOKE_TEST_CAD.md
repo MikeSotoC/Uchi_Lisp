@@ -16,12 +16,14 @@ Validar carga estable por APPLOAD, comandos base y aislamiento de ruta activa.
 6. Ejecutar comando `UCHI_IMPORTAR_PUNTOS` con un CSV de prueba.
 7. Verificar log de puntos importados y guardado de proyecto.
 8. Ejecutar comando `UCHI_VALIDAR_PUNTOS` sobre el último archivo.
-9. Ejecutar comando `UCHI_TOPO`.
-10. Ejecutar `UCHI_DIAG` y validar launcher/appdir en logs.
-11. Revisar logs `[UCHI] Flujo topográfico base iniciado/completado`.
-12. Forzar fallback: mover temporalmente módulos de A y dejar `UCHI_APP_DIR` a B.
-13. Verificar que el sistema anuncia fallback usado y ruta final activa.
-14. Restaurar módulos y repetir APPLOAD en A.
+9. Ejecutar comando `UCHI_SUPERFICIE`.
+10. Ejecutar comando `UCHI_PERFIL`.
+11. Ejecutar comando `UCHI_TOPO`.
+12. Ejecutar `UCHI_DIAG` y validar launcher/appdir en logs.
+13. Revisar logs `[UCHI] Flujo topográfico base iniciado/completado`.
+14. Forzar fallback: mover temporalmente módulos de A y dejar `UCHI_APP_DIR` a B.
+15. Verificar que el sistema anuncia fallback usado y ruta final activa.
+16. Restaurar módulos y repetir APPLOAD en A.
 
 ## Criterio GO
 - No hay mezcla de `app/` entre instalaciones.

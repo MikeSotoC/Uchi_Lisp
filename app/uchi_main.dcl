@@ -24,6 +24,16 @@ uchi_main : dialog {
       label = "Validar puntos";
       is_default = false;
     }
+    : button {
+      key = "build_surface";
+      label = "Generar superficie";
+      is_default = false;
+    }
+    : button {
+      key = "build_profile";
+      label = "Generar perfil";
+      is_default = false;
+    }
     : spacer {}
     ok_cancel;
   }

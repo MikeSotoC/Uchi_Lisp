@@ -16,6 +16,12 @@
     ((= action "valid")
       (C:UCHI_PUNTOS_VALIDAR)
     )
+    ((= action "surface")
+      (C:UCHI_SUPERFICIE)
+    )
+    ((= action "profile")
+      (C:UCHI_PERFIL)
+    )
     (T
       (uchi:log "UI cancelada o no disponible.")
     )
@@ -41,9 +47,16 @@
   (C:UCHI_PUNTOS_IMPORT)
 )
 
-
 (defun C:UCHI_VALIDAR_PUNTOS ()
   (C:UCHI_PUNTOS_VALIDAR)
+)
+
+(defun C:UCHI_SUP ()
+  (C:UCHI_SUPERFICIE)
+)
+
+(defun C:UCHI_PROF ()
+  (C:UCHI_PERFIL)
 )
 
 (defun C:TOPO_BASE ()
