@@ -19,6 +19,11 @@ uchi_main : dialog {
       label = "Importar puntos CSV";
       is_default = false;
     }
+    : button {
+      key = "valid_pts";
+      label = "Validar puntos";
+      is_default = false;
+    }
     : spacer {}
     ok_cancel;
   }

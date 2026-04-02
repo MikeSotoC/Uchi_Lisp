@@ -5,6 +5,8 @@
     (cons "name" "PROYECTO_UCHI")
     (cons "points_file" "")
     (cons "points_count" 0)
+    (cons "points_invalid" 0)
+    (cons "points_dup" 0)
   )
 )
 
@@ -82,16 +84,58 @@
   (uchi:log (strcat "Proyecto activo: " (uchi:ensure-project)))
 )
 
-(defun uchi:import-points-csv (path / lines line cols count)
+(defun uchi:csv-row-valid-p (cols)
+  (and (>= (length cols) 3)
+       (/= (car cols) "")
+       (numberp (distof (cadr cols) 2))
+       (numberp (distof (caddr cols) 2))
+  )
+)
+
+(defun uchi:import-points-csv (path / lines line cols seen valid invalid dup pid)
   (setq lines (uchi:read-lines path))
-  (setq count 0)
+  (setq valid 0)
+  (setq invalid 0)
+  (setq dup 0)
+  (setq seen nil)
+
   (foreach line lines
     (setq cols (uchi:split-csv-line line))
-    (if (>= (length cols) 3)
-      (setq count (+ count 1))
+    (if (uchi:csv-row-valid-p cols)
+      (progn
+        (setq pid (car cols))
+        (if (assoc pid seen)
+          (setq dup (+ dup 1))
+          (progn
+            (setq seen (cons (cons pid T) seen))
+            (setq valid (+ valid 1))
+          )
+        )
+      )
+      (setq invalid (+ invalid 1))
     )
   )
-  count
+
+  (list
+    (cons "valid" valid)
+    (cons "invalid" invalid)
+    (cons "dup" dup)
+  )
+)
+
+(defun uchi:apply-import-summary (f summary)
+  (uchi:project-set "points_file" f)
+  (uchi:project-set "points_count" (cdr (assoc "valid" summary)))
+  (uchi:project-set "points_invalid" (cdr (assoc "invalid" summary)))
+  (uchi:project-set "points_dup" (cdr (assoc "dup" summary)))
+  (uchi:project-save)
+  (uchi:log
+    (strcat
+      "Importación CSV => válidos: " (itoa (cdr (assoc "valid" summary)))
+      ", inválidos: " (itoa (cdr (assoc "invalid" summary)))
+      ", duplicados: " (itoa (cdr (assoc "dup" summary)))
+    )
+  )
 )
 
 (defun C:UCHI_PROY ()
@@ -106,18 +150,28 @@
   (princ)
 )
 
-(defun C:UCHI_PUNTOS_IMPORT (/ f cnt)
+(defun C:UCHI_PUNTOS_IMPORT (/ f summary)
   (uchi:topo-init)
   (setq f (getfiled "Seleccione CSV de puntos" "" "csv" 16))
   (if f
     (progn
-      (setq cnt (uchi:import-points-csv f))
-      (uchi:project-set "points_file" f)
-      (uchi:project-set "points_count" cnt)
-      (uchi:project-save)
-      (uchi:log (strcat "Puntos importados: " (itoa cnt)))
+      (setq summary (uchi:import-points-csv f))
+      (uchi:apply-import-summary f summary)
     )
     (uchi:log "Importación cancelada.")
+  )
+  (princ)
+)
+
+(defun C:UCHI_PUNTOS_VALIDAR (/ f summary)
+  (uchi:topo-init)
+  (setq f (uchi:project-get "points_file"))
+  (if (and f (/= f "") (findfile f))
+    (progn
+      (setq summary (uchi:import-points-csv f))
+      (uchi:apply-import-summary f summary)
+    )
+    (uchi:log "No hay archivo de puntos previo para validar.")
   )
   (princ)
 )

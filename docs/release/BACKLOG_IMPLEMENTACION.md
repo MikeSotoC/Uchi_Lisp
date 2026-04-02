@@ -5,11 +5,11 @@
 - Carga ordenada de módulos y fallback controlado.
 - Compatibilidad AutoCAD/ZWCAD con fallback de DCL.
 - UI base UCHI y flujo topográfico base (`UCHI_FLUJO`).
-- Importación inicial de puntos CSV (`UCHI_PUNTOS_IMPORT`) con persistencia de proyecto.
+- Importación y validación inicial de puntos CSV (`UCHI_PUNTOS_IMPORT`/`UCHI_VALIDAR_PUNTOS`) con persistencia de proyecto.
 - Compatibilidad de comandos legacy (`UCHI_MAIN`, `TOPO_BASE`).
 
 ## Falta implementar para release funcional completo
-1. **Puntos**: validación avanzada (ID/cota duplicada, coordenadas inválidas) y reporte detallado.
+1. **Puntos**: reglas avanzadas extra (códigos, tolerancias, filtros por capa) y reporte exportable.
 2. **Superficie**: triangulación/TIN y suavizado configurable.
 3. **Curvas**: generación real por intervalo mayor/menor con estilos de capa.
 4. **Perfiles**: eje + rasante + secciones transversales.

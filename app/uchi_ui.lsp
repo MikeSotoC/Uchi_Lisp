@@ -16,6 +16,7 @@
           (set_tile "subtitle_txt" "Topografía productiva")
           (action_tile "run_flujo" "(setq action \"flujo\") (done_dialog 1)")
           (action_tile "import_pts" "(setq action \"import\") (done_dialog 1)")
+          (action_tile "valid_pts" "(setq action \"valid\") (done_dialog 1)")
           (action_tile "accept" "(setq action \"ok\") (done_dialog 1)")
           (action_tile "cancel" "(setq action \"cancel\") (done_dialog 0)")
           (start_dialog)
