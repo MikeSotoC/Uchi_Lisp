@@ -110,6 +110,7 @@
   (if (> (length *uchi-points*) 2)
     (progn
       (C:UCHI_ESTILOS)
+      (C:UCHI_BOUNDARY)
       (setq mesh (uchi:mesh-from-tin-or-strip))
       (setq *uchi-mesh* mesh)
       (setq area (uchi:mesh-area-total mesh))

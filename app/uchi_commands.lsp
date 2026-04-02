@@ -58,6 +58,9 @@
     ((= action "tin")
       (C:UCHI_TIN)
     )
+    ((= action "boundary")
+      (C:UCHI_BOUNDARY)
+    )
     (T
       (uchi:log "UI cancelada o no disponible.")
     )
@@ -138,6 +141,10 @@
 
 (defun C:UCHI_TIN_GEN ()
   (C:UCHI_TIN)
+)
+
+(defun C:UCHI_BOUND ()
+  (C:UCHI_BOUNDARY)
 )
 
 (defun C:TOPO_BASE ()

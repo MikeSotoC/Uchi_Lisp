@@ -29,13 +29,14 @@ Validar carga estable por APPLOAD, comandos base y aislamiento de ruta activa.
 19. Ejecutar `UCHI_QC` y validar métricas (dup_rate/inv_rate/tri/area).
 20. Ejecutar `UCHI_RELEASE_GO` y verificar mensaje GO/NO-GO.
 21. Ejecutar `UCHI_ESTILOS` y validar capas UCHI creadas.
-22. Ejecutar `UCHI_TIN` y validar cantidad de triángulos TIN.
-23. Ejecutar `UCHI_EXPORT_LANDXML` y verificar `uchi_surface.xml` con caras `<Faces>`.
-24. Ejecutar `UCHI_DIAG` y validar launcher/appdir en logs.
-25. Revisar logs `[UCHI] Flujo topográfico base iniciado/completado`.
-26. Forzar fallback: mover temporalmente módulos de A y dejar `UCHI_APP_DIR` a B.
-27. Verificar que el sistema anuncia fallback usado y ruta final activa.
-28. Restaurar módulos y repetir APPLOAD en A.
+22. Ejecutar `UCHI_BOUNDARY` y validar polígono boundary dibujado.
+23. Ejecutar `UCHI_TIN` y validar cantidad de triángulos TIN dentro del boundary.
+24. Ejecutar `UCHI_EXPORT_LANDXML` y verificar `uchi_surface.xml` con caras `<Faces>`.
+25. Ejecutar `UCHI_DIAG` y validar launcher/appdir en logs.
+26. Revisar logs `[UCHI] Flujo topográfico base iniciado/completado`.
+27. Forzar fallback: mover temporalmente módulos de A y dejar `UCHI_APP_DIR` a B.
+28. Verificar que el sistema anuncia fallback usado y ruta final activa.
+29. Restaurar módulos y repetir APPLOAD en A.
 
 ## Criterio GO
 - No hay mezcla de `app/` entre instalaciones.

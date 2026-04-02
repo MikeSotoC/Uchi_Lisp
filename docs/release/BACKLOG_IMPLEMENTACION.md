@@ -15,7 +15,7 @@
 
 ## Falta implementar para release funcional completo
 1. **Puntos**: reglas avanzadas extra (códigos, tolerancias, filtros por capa) y reporte exportable.
-2. **Superficie**: motor TIN base implementado; falta robustecer con breaklines, límites y suavizado avanzado.
+2. **Superficie**: TIN + boundary base implementado; falta robustecer con breaklines reales, límites complejos y suavizado avanzado.
 3. **Curvas**: mejorar calidad geométrica de curvas (actualmente se dibujan líneas base por intervalo).
 4. **Perfiles y secciones**: mejorar plantillas y anotaciones (ya se dibuja perfil/secciones base).
 5. **Persistencia**: migrar de `.dat` a `.uchi.json` con versionado de esquema.

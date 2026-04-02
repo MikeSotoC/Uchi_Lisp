@@ -24,6 +24,21 @@
   out
 )
 
+
+(defun uchi:tri-centroid-xy (tri)
+  (list
+    (/ (+ (cadr (car tri)) (cadr (cadr tri)) (cadr (caddr tri))) 3.0)
+    (/ (+ (caddr (car tri)) (caddr (cadr tri)) (caddr (caddr tri))) 3.0)
+  )
+)
+
+(defun uchi:tri-inside-boundary-p (tri)
+  (if (and *uchi-boundary* (> (length *uchi-boundary*) 2))
+    (uchi:boundary-point-in-poly (uchi:tri-centroid-xy tri) *uchi-boundary*)
+    T
+  )
+)
+
 (defun uchi:tin-generate (/ tris keys p near tri key)
   (setq tris nil keys nil)
   (foreach p *uchi-points*
@@ -31,7 +46,8 @@
     (if (= (length near) 2)
       (progn
         (setq tri (list p (nth 0 near) (nth 1 near)))
-        (if (> (uchi:tri-area2d (car tri) (cadr tri) (caddr tri)) 0.00001)
+        (if (and (> (uchi:tri-area2d (car tri) (cadr tri) (caddr tri)) 0.00001)
+                 (uchi:tri-inside-boundary-p tri))
           (progn
             (setq key (uchi:triangle-key (car tri) (cadr tri) (caddr tri)))
             (if (not (assoc key keys))

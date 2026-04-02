@@ -94,6 +94,11 @@ uchi_main : dialog {
       label = "Generar TIN";
       is_default = false;
     }
+    : button {
+      key = "build_boundary";
+      label = "Generar boundary";
+      is_default = false;
+    }
     : spacer {}
     ok_cancel;
   }
