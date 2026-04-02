@@ -7,6 +7,51 @@
   (strcat (nth 0 ids) "|" (nth 1 ids) "|" (nth 2 ids))
 )
 
+(defun uchi:edge-key (a b / ia ib)
+  (setq ia (car a) ib (car b))
+  (if (< (vl-string-compare ia ib) 0)
+    (strcat ia "|" ib)
+    (strcat ib "|" ia)
+  )
+)
+
+(defun uchi:triangle-has-id-p (tri pid)
+  (or (= (car (car tri)) pid)
+      (= (car (cadr tri)) pid)
+      (= (car (caddr tri)) pid))
+)
+
+(defun uchi:triangle-involves-super-p (tri superids / hit sid)
+  (setq hit nil)
+  (foreach sid superids
+    (if (uchi:triangle-has-id-p tri sid) (setq hit T))
+  )
+  hit
+)
+
+(defun uchi:circumcircle-contains-p (tri p / ax ay bx by cx cy d ux uy r2 dx dy)
+  ;; Circuncentro 2D del triángulo y prueba p dentro del círculo circunscrito.
+  (setq ax (cadr (car tri)) ay (caddr (car tri)))
+  (setq bx (cadr (cadr tri)) by (caddr (cadr tri)))
+  (setq cx (cadr (caddr tri)) cy (caddr (caddr tri)))
+  (setq d (* 2.0 (+ (* ax (- by cy)) (* bx (- cy ay)) (* cx (- ay by)))))
+  (if (< (abs d) 1e-12)
+    nil
+    (progn
+      (setq ux (/ (+ (* (+ (* ax ax) (* ay ay)) (- by cy))
+                     (* (+ (* bx bx) (* by by)) (- cy ay))
+                     (* (+ (* cx cx) (* cy cy)) (- ay by))) d))
+      (setq uy (/ (+ (* (+ (* ax ax) (* ay ay)) (- cx bx))
+                     (* (+ (* bx bx) (* by by)) (- ax cx))
+                     (* (+ (* cx cx) (* cy cy)) (- bx ax))) d))
+      (setq r2 (+ (* (- ux ax) (- ux ax)) (* (- uy ay) (- uy ay))))
+      (setq dx (- (cadr p) ux))
+      (setq dy (- (caddr p) uy))
+      (<= (+ (* dx dx) (* dy dy)) (+ r2 1e-8))
+    )
+  )
+)
+
 (defun uchi:nearest-two-points (p pts / sorted out q)
   (setq sorted
     (vl-sort pts
@@ -112,7 +157,9 @@
     (progn
       (setq p T)
       (foreach xy tri
-        (if (not (uchi:boundary-point-in-poly (list (cadr xy) (caddr xy)) *uchi-boundary*))
+        (if (not (if (fboundp 'uchi:boundary-point-in-scope)
+                   (uchi:boundary-point-in-scope (list (cadr xy) (caddr xy)))
+                   (uchi:boundary-point-in-poly (list (cadr xy) (caddr xy)) *uchi-boundary*)))
           (setq p nil)
         )
       )
@@ -125,7 +172,9 @@
 (defun uchi:tri-inside-boundary-p (tri)
   (and (uchi:tri-vertices-inside-boundary-p tri)
        (if (and *uchi-boundary* (> (length *uchi-boundary*) 2))
-         (uchi:boundary-point-in-poly (uchi:tri-centroid-xy tri) *uchi-boundary*)
+         (if (fboundp 'uchi:boundary-point-in-scope)
+           (uchi:boundary-point-in-scope (uchi:tri-centroid-xy tri))
+           (uchi:boundary-point-in-poly (uchi:tri-centroid-xy tri) *uchi-boundary*))
          T))
 )
 
@@ -146,50 +195,114 @@
   (list tris keys)
 )
 
-(defun uchi:tin-generate (/ tris keys p near tri key bl p1 p2 sorted i out)
-  (setq tris nil keys nil)
+(defun uchi:tin-super-triangle (/ xmin xmax ymin ymax p dx dy dmax midx midy s1 s2 s3)
+  (setq xmin (cadr (car *uchi-points*)) xmax xmin
+        ymin (caddr (car *uchi-points*)) ymax ymin)
   (foreach p *uchi-points*
-    (setq near (uchi:nearest-two-points p *uchi-points*))
-    (if (= (length near) 2)
-      (progn
-        (setq tri (list p (nth 0 near) (nth 1 near)))
-        (setq out (uchi:tin-add-triangle-if-valid tri tris keys))
-        (setq tris (car out) keys (cadr out))
-      )
-    )
+    (if (< (cadr p) xmin) (setq xmin (cadr p)))
+    (if (> (cadr p) xmax) (setq xmax (cadr p)))
+    (if (< (caddr p) ymin) (setq ymin (caddr p)))
+    (if (> (caddr p) ymax) (setq ymax (caddr p)))
   )
-  ;; Triángulos forzados por breaklines hard: para cada segmento se conecta al punto
-  ;; más cercano por cada lado geométrico (regla simple de ingeniería base).
-  (foreach bl (uchi:hard-breaklines)
-    (setq p1 (uchi:point-by-id (car bl)))
-    (setq p2 (uchi:point-by-id (cadr bl)))
-    (if (and p1 p2)
-      (progn
-        (setq sorted
-          (vl-sort *uchi-points*
-            '(lambda (u v)
-               (< (+ (uchi:point-distance2d u p1) (uchi:point-distance2d u p2))
-                  (+ (uchi:point-distance2d v p1) (uchi:point-distance2d v p2)))
-             )
+  (setq dx (- xmax xmin) dy (- ymax ymin) dmax (max dx dy))
+  (setq midx (/ (+ xmin xmax) 2.0) midy (/ (+ ymin ymax) 2.0))
+  (setq s1 (list "__SUP1" (- midx (* 20.0 dmax)) (- midy dmax) 0.0))
+  (setq s2 (list "__SUP2" midx (+ midy (* 20.0 dmax)) 0.0))
+  (setq s3 (list "__SUP3" (+ midx (* 20.0 dmax)) (- midy dmax) 0.0))
+  (list s1 s2 s3)
+)
+
+(defun uchi:tin-generate (/ tris p bad tri poly edge key ekeys keep super superids out keys bl p1 p2 sorted i)
+  (if (<= (length *uchi-points*) 2)
+    nil
+    (progn
+      (setq super (uchi:tin-super-triangle))
+      (setq superids (list "__SUP1" "__SUP2" "__SUP3"))
+      (setq tris (list super))
+
+      ;; Bowyer-Watson incremental.
+      (foreach p *uchi-points*
+        (setq bad nil)
+        (foreach tri tris
+          (if (uchi:circumcircle-contains-p tri p)
+            (setq bad (append bad (list tri)))
           )
         )
-        (setq i 0)
-        (while (< i (length sorted))
-          (setq p (nth i sorted))
-          (if (and (/= (car p) (car p1)) (/= (car p) (car p2)))
-            (progn
-              (setq tri (list p1 p2 p))
-              (setq out (uchi:tin-add-triangle-if-valid tri tris keys))
-              (setq tris (car out) keys (cadr out))
-              (setq i (length sorted))
+
+        ;; Frontera del hueco (aristas no compartidas entre triángulos "bad").
+        (setq ekeys nil poly nil)
+        (foreach tri bad
+          (foreach edge (uchi:triangle-edges tri)
+            (setq key (uchi:edge-key (car edge) (cadr edge)))
+            (if (assoc key ekeys)
+              (setq ekeys (subst (cons key (+ 1 (cdr (assoc key ekeys)))) (assoc key ekeys) ekeys))
+              (setq ekeys (cons (cons key 1) ekeys))
             )
-            (setq i (+ i 1))
+            (setq poly (append poly (list edge)))
+          )
+        )
+        ;; Eliminar triángulos bad.
+        (setq keep nil)
+        (foreach tri tris
+          (if (not (vl-position tri bad))
+            (setq keep (append keep (list tri)))
+          )
+        )
+        (setq tris keep)
+
+        ;; Recrear triangulación local con aristas de frontera.
+        (foreach edge poly
+          (setq key (uchi:edge-key (car edge) (cadr edge)))
+          (if (= (cdr (assoc key ekeys)) 1)
+            (setq tris (append tris (list (list (car edge) (cadr edge) p))))
           )
         )
       )
+
+      ;; Filtrar super-triangle y validar boundary/breaklines.
+      (setq out nil keys nil)
+      (foreach tri tris
+        (if (not (uchi:triangle-involves-super-p tri superids))
+          (progn
+            (setq out (uchi:tin-add-triangle-if-valid tri out keys))
+            (setq out (car out) keys (cadr out))
+          )
+        )
+      )
+
+      ;; Refuerzo de breaklines hard.
+      (foreach bl (uchi:hard-breaklines)
+        (setq p1 (uchi:point-by-id (car bl)))
+        (setq p2 (uchi:point-by-id (cadr bl)))
+        (if (and p1 p2)
+          (progn
+            (setq sorted
+              (vl-sort *uchi-points*
+                '(lambda (u v)
+                   (< (+ (uchi:point-distance2d u p1) (uchi:point-distance2d u p2))
+                      (+ (uchi:point-distance2d v p1) (uchi:point-distance2d v p2)))
+                 )
+              )
+            )
+            (setq i 0)
+            (while (< i (length sorted))
+              (setq p (nth i sorted))
+              (if (and (/= (car p) (car p1)) (/= (car p) (car p2)))
+                (progn
+                  (setq tri (list p1 p2 p))
+                  (setq keep (uchi:tin-add-triangle-if-valid tri out keys))
+                  (setq out (car keep) keys (cadr keep))
+                  (setq i (length sorted))
+                )
+                (setq i (+ i 1))
+              )
+            )
+          )
+        )
+      )
+      out
     )
   )
-  tris
 )
 
 (defun C:UCHI_TIN ()

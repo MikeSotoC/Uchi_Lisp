@@ -54,6 +54,10 @@
   (sqrt (+ (* dx dx) (* dy dy)))
 )
 
+(defun uchi:segment-valid-p (s tol)
+  (> (uchi:xy-dist (car s) (cadr s)) (* 0.5 tol))
+)
+
 (defun uchi:segment-chain-build (segments tol / chain rest s p0 p1 changed)
   (if (not segments)
     nil
@@ -98,12 +102,39 @@
 
 (defun uchi:segments->polylines (segments tol / pol out)
   (setq out nil)
+  (setq segments (vl-remove-if-not '(lambda (s) (uchi:segment-valid-p s tol)) segments))
   (while segments
     (setq pol (uchi:segment-chain-build segments tol))
     (setq out (append out (list (car pol))))
     (setq segments (cadr pol))
   )
   out
+)
+
+(defun uchi:polyline-dedupe (pts tol / out p lastp)
+  (setq out nil lastp nil)
+  (foreach p pts
+    (if (or (not lastp) (> (uchi:xy-dist p lastp) (* 0.25 tol)))
+      (progn
+        (setq out (append out (list p)))
+        (setq lastp p)
+      )
+    )
+  )
+  out
+)
+
+(defun uchi:polyline-close-if-loop (pts tol / p0 p1)
+  (if (> (length pts) 2)
+    (progn
+      (setq p0 (car pts) p1 (car (reverse pts)))
+      (if (<= (uchi:xy-dist p0 p1) tol)
+        (append pts (list p0))
+        pts
+      )
+    )
+    pts
+  )
 )
 
 (defun uchi:smooth-polyline (pts / out i a b q r)
@@ -140,7 +171,9 @@
     (setq layer (uchi:curve-layer-for-z z major step))
     (setq pls (uchi:segments->polylines segs tol))
     (foreach pl pls
+      (setq pl (uchi:polyline-dedupe pl tol))
       (setq pl (uchi:smooth-polyline pl))
+      (setq pl (uchi:polyline-close-if-loop pl tol))
       (if (> (length pl) 1)
         (progn
           (uchi:draw-polyline-2d pl layer)

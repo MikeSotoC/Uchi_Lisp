@@ -29,8 +29,8 @@ Validar carga estable por APPLOAD, comandos base y aislamiento de ruta activa.
 19. Ejecutar `UCHI_QC` y validar métricas (dup_rate/inv_rate/tri/area).
 20. Ejecutar `UCHI_RELEASE_GO` y verificar mensaje GO/NO-GO.
 21. Ejecutar `UCHI_ESTILOS` y validar capas UCHI creadas.
-22. Ejecutar `UCHI_BOUNDARY` y validar polígono boundary dibujado.
-23. Ejecutar `UCHI_TIN` y validar cantidad de triángulos TIN dentro del boundary.
+22. Ejecutar `UCHI_BOUNDARY` y validar polígono boundary dibujado; opcionalmente definir `UCHI_CFG_BOUNDARY_CSV` + `UCHI_CFG_BOUNDARY_HOLES_CSV` para validar límites/huecos.
+23. Ejecutar `UCHI_TIN` y validar cantidad de triángulos TIN dentro del boundary y fuera de huecos.
 24. Ejecutar `UCHI_BREAKLINES` e importar CSV `p1,p2,tipo` (HARD/SOFT), verificando conteo de válidas/inválidas.
 25. Ejecutar `UCHI_STD` y aplicar preset (MOP/MTC), luego correr `UCHI_PERFIL` y `UCHI_SECCIONES` validando banda técnica/offsets.
 26. Ejecutar `UCHI_JSON` y verificar `uchi_project.uchi.json` con `schema_version`.

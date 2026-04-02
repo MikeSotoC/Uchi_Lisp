@@ -1,6 +1,7 @@
 ;;; UCHI Boundary / breakline base
 
 (setq *uchi-boundary* nil)
+(setq *uchi-boundary-holes* nil)
 
 (defun uchi:cross2d (o a b)
   (- (* (- (cadr a) (cadr o)) (- (caddr b) (caddr o)))
@@ -47,21 +48,82 @@
   inside
 )
 
+(defun uchi:boundary-point-in-scope (pt / inout hole inside-hole)
+  (setq inout (if (and *uchi-boundary* (> (length *uchi-boundary*) 2))
+                (uchi:boundary-point-in-poly pt *uchi-boundary*)
+                T))
+  (setq inside-hole nil)
+  (foreach hole *uchi-boundary-holes*
+    (if (and (> (length hole) 2) (uchi:boundary-point-in-poly pt hole))
+      (setq inside-hole T)
+    )
+  )
+  (and inout (not inside-hole))
+)
+
+(defun uchi:boundary-read-outer-csv (path / out cols line)
+  (setq out nil)
+  (foreach line (uchi:read-lines path)
+    (setq cols (uchi:split-csv-line line))
+    (if (>= (length cols) 2)
+      (setq out (append out (list (list (uchi:to-real (nth 0 cols))
+                                        (uchi:to-real (nth 1 cols))))))
+    )
+  )
+  out
+)
+
+(defun uchi:boundary-read-holes-csv (path / groups line cols hid p g)
+  ;; Formato: hole_id,x,y
+  (setq groups nil)
+  (foreach line (uchi:read-lines path)
+    (setq cols (uchi:split-csv-line line))
+    (if (>= (length cols) 3)
+      (progn
+        (setq hid (nth 0 cols))
+        (setq p (list (uchi:to-real (nth 1 cols)) (uchi:to-real (nth 2 cols))))
+        (setq g (assoc hid groups))
+        (if g
+          (setq groups (subst (cons hid (append (cdr g) (list p))) g groups))
+          (setq groups (append groups (list (cons hid (list p)))))
+        )
+      )
+    )
+  )
+  (mapcar 'cdr groups)
+)
+
 (defun uchi:boundary-draw ()
   (if (and *uchi-boundary* (> (length *uchi-boundary*) 2))
     (uchi:draw-polyline-2d (append *uchi-boundary* (list (car *uchi-boundary*))) "UCHI_BOUNDARY")
   )
+  (foreach h *uchi-boundary-holes*
+    (if (> (length h) 2)
+      (uchi:draw-polyline-2d (append h (list (car h))) "UCHI_BOUNDARY_HOLE")
+    )
+  )
 )
 
-(defun C:UCHI_BOUNDARY ()
+(defun C:UCHI_BOUNDARY (/ fouter fholes)
   (uchi:topo-init)
   (if (> (length *uchi-points*) 2)
     (progn
-      (setq *uchi-boundary* (mapcar '(lambda (p) (list (cadr p) (caddr p))) (uchi:convex-hull (uchi:points-xy-sorted))))
+      (setq fouter (getenv "UCHI_CFG_BOUNDARY_CSV"))
+      (setq fholes (getenv "UCHI_CFG_BOUNDARY_HOLES_CSV"))
+      (if (and fouter (/= fouter "") (findfile fouter))
+        (setq *uchi-boundary* (uchi:boundary-read-outer-csv fouter))
+        (setq *uchi-boundary* (mapcar '(lambda (p) (list (cadr p) (caddr p))) (uchi:convex-hull (uchi:points-xy-sorted))))
+      )
+      (if (and fholes (/= fholes "") (findfile fholes))
+        (setq *uchi-boundary-holes* (uchi:boundary-read-holes-csv fholes))
+        (setq *uchi-boundary-holes* nil)
+      )
       (uchi:project-set "boundary_vertices" (length *uchi-boundary*))
+      (uchi:project-set "boundary_holes" (length *uchi-boundary-holes*))
       (uchi:project-save)
       (uchi:boundary-draw)
-      (uchi:log (strcat "Boundary generada. Vértices=" (itoa (length *uchi-boundary*))))
+      (uchi:log (strcat "Boundary generada. Vértices=" (itoa (length *uchi-boundary*))
+                        ", huecos=" (itoa (length *uchi-boundary-holes*))))
     )
     (uchi:log "Boundary: se requieren al menos 3 puntos válidos.")
   )
