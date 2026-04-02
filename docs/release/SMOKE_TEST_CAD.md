@@ -39,14 +39,16 @@ Validar carga estable por APPLOAD, comandos base y aislamiento de ruta activa.
 29. Ejecutar `UCHI_TEMPLATE` (Perú) y confirmar variables base de carreteras/redes/catastro.
 30. Ejecutar `UCHI_CATASTRO` y verificar `uchi_catastro.csv` con lotes.
 31. Ejecutar `UCHI_CATASTRO_RUR` y verificar `uchi_catastro_rural.csv` con `area_m2/area_ha`.
-32. Ejecutar `UCHI_REDES_PE` y verificar `uchi_redes.csv` con `AGUA/DESAGUE`, `BZ` y accesorios.
-33. Ejecutar `UCHI_ROAD` y validar dibujo de secciones tipo en capa `UCHI_ROAD`.
-34. Ejecutar `UCHI_EXPORT_LANDXML` y verificar `uchi_surface.xml` con caras `<Faces>`.
-35. Ejecutar `UCHI_DIAG` y validar launcher/appdir en logs.
-36. Revisar logs `[UCHI] Flujo topográfico base iniciado/completado`.
-37. Forzar fallback: mover temporalmente módulos de A y dejar `UCHI_APP_DIR` a B.
-38. Verificar que el sistema anuncia fallback usado y ruta final activa.
-39. Restaurar módulos y repetir APPLOAD en A.
+32. Ejecutar `UCHI_SUBDIV` y verificar `uchi_subdivision.csv` (row/col/area) + geometría en capa `UCHI_SUBDIV`.
+33. Ejecutar `UCHI_MODULOS` y validar inventario por dominios en logs.
+34. Ejecutar `UCHI_REDES_PE` y verificar `uchi_redes.csv` con `AGUA/DESAGUE`, `BZ` y accesorios.
+35. Ejecutar `UCHI_ROAD` y validar dibujo de secciones tipo en capa `UCHI_ROAD`.
+36. Ejecutar `UCHI_EXPORT_LANDXML` y verificar `uchi_surface.xml` con caras `<Faces>`.
+37. Ejecutar `UCHI_DIAG` y validar launcher/appdir en logs.
+38. Revisar logs `[UCHI] Flujo topográfico base iniciado/completado`.
+39. Forzar fallback: mover temporalmente módulos de A y dejar `UCHI_APP_DIR` a B.
+40. Verificar que el sistema anuncia fallback usado y ruta final activa.
+41. Restaurar módulos y repetir APPLOAD en A.
 
 ## Criterio GO
 - No hay mezcla de `app/` entre instalaciones.

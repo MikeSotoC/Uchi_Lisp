@@ -183,6 +183,10 @@
   (C:UCHI_CATASTRO_RURAL)
 )
 
+(defun C:UCHI_SUBDIV ()
+  (C:UCHI_SUBDIVISION)
+)
+
 (defun C:UCHI_REDES_PE ()
   (C:UCHI_REDES)
 )

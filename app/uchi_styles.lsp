@@ -13,6 +13,7 @@
     (list "UCHI_DRAINAGE" 151)
     (list "UCHI_CATASTRO" 34)
     (list "UCHI_CATASTRO_RURAL" 82)
+    (list "UCHI_SUBDIV" 90)
     (list "UCHI_WATER" 150)
     (list "UCHI_SEWER" 10)
     (list "UCHI_ROAD" 32)
