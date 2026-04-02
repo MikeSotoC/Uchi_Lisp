@@ -1,6 +1,6 @@
 # UCHI — Reporte de Gate de Release
 
-Fecha: 2026-04-02 03:01:03 UTC
+Fecha: 2026-04-02 03:09:08 UTC
 
 ## Contexto
 Este gate prioriza estabilidad de producción y bloquea release cuando faltan artefactos críticos.
@@ -78,14 +78,14 @@ Resultado: PASS
 ./docs/release/SMOKE_TEST_CAD.md:31:- No hay mezcla de `app/` entre instalaciones.
 ./docs/release/COMPATIBILIDAD_CAD.md:7:- Capa `app/uchi_cad_compat.lsp` para detección de plataforma y capacidades.
 ./docs/release/COMPATIBILIDAD_CAD.md:22:1. APPLOAD `main.lsp`.
-./docs/release/PLAN_INTERVENCION_PROD.md:9:- Ruta activa derivada de `main.lsp` cargado por APPLOAD (sin fallback ambiguo por Support Path).
-./docs/release/PLAN_INTERVENCION_PROD.md:10:- Carga determinista: orden explícito + validación de existencia antes de `(load ...)`.
 ./docs/release/REPORTE_GATE.md:21:test -f main.lsp
 ./docs/release/REPORTE_GATE.md:28:### Launcher no vive dentro de app/
 ./docs/release/REPORTE_GATE.md:30:test ! -f app/main.lsp
 ./docs/release/REPORTE_GATE.md:39:test -f app/uchi_cad_compat.lsp
 ./docs/release/REPORTE_GATE.md:48:rg -n 'CivilCAD-like|civilcad|CivilCAD' app/uchi_ui.lsp app/uchi_commands.lsp app/*.dcl
 ./docs/release/REPORTE_GATE.md:57:rg -n --glob '!.git/**' 'main.lsp|APPLOAD|app/|autoload|Support Path|support path|\(load' . || true
+./docs/release/PLAN_INTERVENCION_PROD.md:9:- Ruta activa derivada de `main.lsp` cargado por APPLOAD (sin fallback ambiguo por Support Path).
+./docs/release/PLAN_INTERVENCION_PROD.md:10:- Carga determinista: orden explícito + validación de existencia antes de `(load ...)`.
 ```
 
 ## Gate de artefactos

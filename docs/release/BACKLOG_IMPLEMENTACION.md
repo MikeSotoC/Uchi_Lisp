@@ -10,9 +10,9 @@
 
 ## Falta implementar para release funcional completo
 1. **Puntos**: reglas avanzadas extra (códigos, tolerancias, filtros por capa) y reporte exportable.
-2. **Superficie**: completar TIN real (ya existe rutina base `UCHI_SUPERFICIE`) y suavizado configurable.
-3. **Curvas**: completar estilos/capas y suavizado (ya existe base `UCHI_CURVAS_GEN` con intervalos).
-4. **Perfiles y secciones**: completar longitudinal/transversal avanzado (base `UCHI_PERFIL` y `UCHI_SECCIONES` ya disponible).
+2. **Superficie**: integrar triangulación geométrica completa (actualmente usa bbox/estadística base) y suavizado configurable.
+3. **Curvas**: agregar dibujo real en CAD con estilos/capas (actualmente calcula conteos por intervalo).
+4. **Perfiles y secciones**: agregar geometría/dibujo real de perfil y secciones (actualmente calcula longitud/estaciones).
 5. **Persistencia**: migrar de `.dat` a `.uchi.json` con versionado de esquema.
 6. **QA CAD real**: matriz por versión de AutoCAD y ZWCAD con evidencias.
 7. **Telemetría soporte**: log a archivo con rotación (además de consola `[UCHI]`).

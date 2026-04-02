@@ -8,6 +8,16 @@
   (vl-princ-to-string v)
 )
 
+(defun uchi:to-real (v)
+  (distof (vl-princ-to-string v) 2)
+)
+
+(defun uchi:point-distance2d (a b / dx dy)
+  (setq dx (- (cadr b) (cadr a)))
+  (setq dy (- (caddr b) (caddr a)))
+  (sqrt (+ (* dx dx) (* dy dy)))
+)
+
 (defun uchi:read-lines (path / fp lines line)
   (setq lines nil)
   (if (and path (findfile path))
