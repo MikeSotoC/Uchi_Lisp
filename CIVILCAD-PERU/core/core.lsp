@@ -11,7 +11,8 @@
 ;;; Fallback seguro para vl-prin1-to-string (compatible ZWCAD/AutoCAD)
 (defun vl-prin1-to-string-safe (obj / result str-result)
   ;; Intentar usar vl-prin1-to-string si está disponible
-  (if (boundp 'vl-prin1-to-string)
+  (if (and (boundp 'vl-prin1-to-string) 
+           (not (vl-catch-all-error-p (vl-catch-all-apply '(lambda () (vl-prin1-to-string ""))))))
     (progn
       (setq result (vl-catch-all-apply '(lambda () (vl-prin1-to-string obj))))
       (if (or (null result) (vl-catch-all-error-p result))
@@ -40,7 +41,8 @@
 ;;; Función: vl-symbol-name-safe
 ;;; Fallback seguro para vl-symbol-name
 (defun vl-symbol-name-safe (sym / result)
-  (if (boundp 'vl-symbol-name)
+  (if (and (boundp 'vl-symbol-name)
+           (not (vl-catch-all-error-p (vl-catch-all-apply '(lambda () (vl-symbol-name 'test))))))
     (progn
       (setq result (vl-catch-all-apply '(lambda () (vl-symbol-name sym))))
       (if (or (null result) (vl-catch-all-error-p result))
@@ -55,7 +57,8 @@
 ;;; Función: vl-list->string-safe
 ;;; Fallback seguro para vl-list->string
 (defun vl-list->string-safe (lst / result str)
-  (if (boundp 'vl-list->string)
+  (if (and (boundp 'vl-list->string)
+           (not (vl-catch-all-error-p (vl-catch-all-apply '(lambda () (vl-list->string '(1 2 3)))))))
     (progn
       (setq result (vl-catch-all-apply '(lambda () (vl-list->string lst))))
       (if (or (null result) (vl-catch-all-error-p result))
@@ -65,6 +68,26 @@
       )
     )
     (princ-to-string lst)
+  )
+)
+
+;;; Función: vl-catch-all-error-message-safe
+;;; Fallback seguro para vl-catch-all-error-message (compatible ZWCAD/AutoCAD)
+(defun vl-catch-all-error-message-safe (err-obj / result)
+  (cond
+    ;; Si es un objeto de error VLISP
+    ((and (boundp 'vl-catch-all-error-message)
+          (not (vl-catch-all-error-p (vl-catch-all-apply '(lambda () (vl-catch-all-error-message err-obj))))))
+      (setq result (vl-catch-all-apply '(lambda () (vl-catch-all-error-message err-obj))))
+      (if (or (null result) (vl-catch-all-error-p result))
+        (princ-to-string err-obj)
+        result
+      )
+    )
+    ;; Si err-obj ya es un string
+    ((stringp err-obj) err-obj)
+    ;; Fallback genérico
+    (t (princ-to-string err-obj))
   )
 )
 

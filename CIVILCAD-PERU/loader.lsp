@@ -220,16 +220,16 @@
       (princ "\n[LOADER] Registry ya inicializado.")
     )
     (progn
-      (if (CCP-fboundp-early 'CCP_initialize-registry)
-        (CCP_initialize-registry)
-        (princ "\n[LOADER] ADVERTENCIA: CCP_initialize-registry no disponible, usando fallback.")
+      (if (CCP-fboundp-early 'CCP-initialize-registry)
+        (CCP-initialize-registry)
+        (princ "\n[LOADER] ADVERTENCIA: CCP-initialize-registry no disponible, usando fallback.")
       )
     )
   )
   
   ;; Inicializar logging
-  (if (CCP-fboundp-early 'CCP_init-logging)
-    (CCP_init-logging)
+  (if (CCP-fboundp-early 'CCP-init-logging)
+    (CCP-init-logging)
   )
   
   (setq *CCP_INITIALIZED* T)

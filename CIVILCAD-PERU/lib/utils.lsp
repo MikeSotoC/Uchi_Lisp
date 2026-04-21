@@ -222,7 +222,7 @@
 (defun CCP-get-timestamp ()
   (cond
     ;; Método 1: Usar menucmd si está disponible (AutoCAD)
-    ((CCP-fboundp-safe 'menucmd)
+    ((and (CCP-fboundp-early 'menucmd) (not (vl-catch-all-error-p (vl-catch-all-apply '(lambda () (menucmd ""))))))
       (menucmd "M=$(edtime,$(getvar,date),YYYY-MM-DD HH:MM:SS)")
     )
     ;; Método 2: Usar rtos con CDATE (ZWCAD/AutoCAD)

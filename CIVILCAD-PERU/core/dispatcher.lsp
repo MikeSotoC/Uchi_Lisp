@@ -46,8 +46,8 @@
           (if (vl-catch-all-error-p result)
             (progn
               (setq error-occurred T)
-              (princ (strcat "\n[DISPATCHER] ERROR en INIT: " (vl-catch-all-error-message result)))
-              (CCP-log-event "error" (strcat "Error en INIT de " module-key ": " (vl-catch-all-error-message result)))
+              (princ (strcat "\n[DISPATCHER] ERROR en INIT: " (vl-catch-all-error-message-safe result)))
+              (CCP-log-event "error" (strcat "Error en INIT de " module-key ": " (vl-catch-all-error-message-safe result)))
             )
             (progn
               (princ "\n[DISPATCHER] Inicialización completada.")
@@ -69,8 +69,8 @@
           (if (vl-catch-all-error-p result)
             (progn
               (setq error-occurred T)
-              (princ (strcat "\n[DISPATCHER] ERROR en RUN: " (vl-catch-all-error-message result)))
-              (CCP-log-event "error" (strcat "Error en RUN de " module-key ": " (vl-catch-all-error-message result)))
+              (princ (strcat "\n[DISPATCHER] ERROR en RUN: " (vl-catch-all-error-message-safe result)))
+              (CCP-log-event "error" (strcat "Error en RUN de " module-key ": " (vl-catch-all-error-message-safe result)))
               (CCP-cancel-undo)
               (princ "\n[DISPATCHER] Operación cancelada. Cambios deshechos.")
             )
@@ -144,8 +144,8 @@
       (if (vl-catch-all-error-p result)
         (progn
           (princ (strcat "\n[DISPATCHER] Error ejecutando " (vl-prin1-to-string-safe func-name) ": "))
-          (princ (vl-catch-all-error-message result))
-          (CCP-log-event "error" (strcat "Error en " (vl-prin1-to-string-safe func-name) ": " (vl-catch-all-error-message result)))
+          (princ (vl-catch-all-error-message-safe result))
+          (CCP-log-event "error" (strcat "Error en " (vl-prin1-to-string-safe func-name) ": " (vl-catch-all-error-message-safe result)))
           nil
         )
         result
