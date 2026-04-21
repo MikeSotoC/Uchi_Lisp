@@ -61,6 +61,7 @@
 (defun uchi:launcher-file ()
   (cond
     ((and (boundp '*load-truename*) *load-truename*) *load-truename*)
+    ((and (boundp '*load-file-name*) *load-file-name*) (findfile *load-file-name*))
     ((findfile *uchi-launcher-name*))
     (T nil)
   )
@@ -74,19 +75,29 @@
   )
 )
 
-(defun uchi:launcher-valid-p (/ f d fname)
+(defun uchi:launcher-valid-p (/ f d fname app-core)
   (setq f (uchi:launcher-file))
   (setq d (uchi:launcher-dir))
   (setq fname (if f (vl-filename-base f) ""))
+  (setq app-core (if d (strcat d "/app/uchi_core.lsp") nil))
+  
+  ;; Debug logging
+  ;(uchi:log (strcat "DEBUG: f=" (if f f "nil") " d=" (if d d "nil") " fname=" fname))
+  
   (and f
        d
-       (= (strcase fname) "MAIN")
+       (= (strcase fname) "MAIN.LSP")
        (not (wcmatch (strcase d) "*/*/APP"))
        (not (wcmatch (strcase d) "*/APP"))
-       (or (wcmatch (strcase d) "*UCHI*")
+       (or 
+           ;; Verifica que exista app/uchi_core.lsp relativo al launcher
+           (findfile app-core)
+           ;; O patrones comunes en el nombre de la carpeta padre
+           (wcmatch (strcase d) "*UCHI*")
            (wcmatch (strcase d) "*LISP*")
            (wcmatch (strcase d) "*PROYECTO*")
-           (findfile (strcat d "/app/uchi_core.lsp")))
+           (wcmatch (strcase d) "*DESKTOP*")
+       )
   )
 )
 
