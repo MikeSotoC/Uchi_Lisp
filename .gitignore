@@ -1,0 +1,48 @@
+```
+# Auto-generated from file changes
+*.lsp~
+
+# Compiled LISP files (if any)
+*.fas
+*.fsl
+*.lbi
+
+# Backup files
+*~
+\#*\#
+*.bak
+*.backup
+
+# Temporary files
+*.tmp
+*.temp
+
+# Logs
+*.log
+
+# Environment specific
+.env
+.env.local
+*.env.*
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Build/distribution directories
+dist/
+build/
+target/
+bin/
+out/
+
+# Dependencies
+node_modules/
+venv/
+.venv/
+__pycache__/
+*.egg-info/
+.Python/
+```
