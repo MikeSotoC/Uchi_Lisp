@@ -7,6 +7,35 @@
 (setq *CCP_CORE_VERSION* "1.0.0")
 (setq *CCP_DEBUG_MODE* nil)
 
+;;; Función: CCP-fboundp-safe
+;;; Verifica si una función existe (compatible ZWCAD/AutoCAD)
+;;; Esta función NO usa fboundp directamente para evitar errores en ZWCAD
+(defun CCP-fboundp-safe (func-name / result test-result)
+  ;; Intentar verificar si el símbolo está bound
+  (setq result 
+    (vl-catch-all-apply
+      '(lambda ()
+         (setq test-result (eval func-name))
+         (if (or (functionp test-result) (subrp test-result))
+           T
+           (progn
+             ;; Si no es función directa, verificar si puede ser llamada
+             (vl-catch-all-apply
+               '(lambda () (apply func-name nil))
+             )
+             T
+           )
+         )
+       )
+    )
+  )
+  ;; Si hubo error, la función no existe
+  (if (vl-catch-all-error-p result)
+    nil
+    result
+  )
+)
+
 ;;; Función: CCP-debug
 ;;; Imprime mensajes de debug si está activado
 (defun CCP-debug (msg)
@@ -18,8 +47,8 @@
 ;;; Función: CCP-safe-call
 ;;; Ejecuta una función con manejo seguro de errores (compatible ZWCAD/AutoCAD)
 (defun CCP-safe-call (func-name / result)
-  (if (fboundp func-name)
-    (vl-catch-all-apply (function (lambda () (apply func-name nil))))
+  (if (CCP-fboundp-safe func-name)
+    (vl-catch-all-apply '(lambda () (apply func-name nil)))
     (progn
       (princ (strcat "\n[CORE] Función no encontrada: " (vl-prin1-to-string func-name)))
       nil

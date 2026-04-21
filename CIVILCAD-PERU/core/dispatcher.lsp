@@ -1,6 +1,6 @@
 ;;; ============================================================================
 ;;; CIVILCAD-PERÚ - DISPATCHER SYSTEM
-;;; Ejecutor unificado de módulos
+;;; Ejecutor unificado de módulos - Compatible con AutoCAD y ZWCAD
 ;;; ============================================================================
 
 ;;; Variables globales del dispatcher
@@ -38,7 +38,7 @@
       (CCP-start-undo)
       
       ;; Ejecutar INIT si existe
-      (if (and init-func (fboundp init-func))
+      (if (and init-func (CCP-fboundp-safe init-func))
         (progn
           (princ "\n[DISPATCHER] Ejecutando inicialización...")
           (setq result (vl-catch-all-apply init-func))
@@ -61,7 +61,7 @@
       )
       
       ;; Ejecutar RUN si no hubo error en INIT
-      (if (and (not error-occurred) run-func (fboundp run-func))
+      (if (and (not error-occurred) run-func (CCP-fboundp-safe run-func))
         (progn
           (princ "\n[DISPATCHER] Ejecutando módulo principal...")
           (setq result (vl-catch-all-apply run-func))
@@ -136,9 +136,9 @@
 )
 
 ;;; Función: CCP-execute-function
-;;; Ejecuta una función específica con manejo de errores
+;;; Ejecuta una función específica con manejo de errores (compatible ZWCAD/AutoCAD)
 (defun CCP-execute-function (func-name args / result)
-  (if (fboundp func-name)
+  (if (CCP-fboundp-safe func-name)
     (progn
       (setq result (vl-catch-all-apply func-name args))
       (if (vl-catch-all-error-p result)
@@ -159,7 +159,7 @@
 )
 
 ;;; Función: CCP-validate-module
-;;; Valida que un módulo esté listo para ejecución
+;;; Valida que un módulo esté listo para ejecución (compatible ZWCAD/AutoCAD)
 (defun CCP-validate-module (module-key / module errors)
   (setq errors nil)
   (setq module (CCP-get-module module-key))
@@ -168,12 +168,12 @@
     (setq errors (append errors '("Módulo no registrado")))
     (progn
       ;; Verificar función INIT
-      (if (not (fboundp (cdr (assoc 'init-func module))))
+      (if (not (CCP-fboundp-safe (cdr (assoc 'init-func module))))
         (setq errors (append errors '("Función INIT no disponible")))
       )
       
       ;; Verificar función RUN
-      (if (not (fboundp (cdr (assoc 'run-func module))))
+      (if (not (CCP-fboundp-safe (cdr (assoc 'run-func module))))
         (setq errors (append errors '("Función RUN no disponible")))
       )
     )

@@ -9,76 +9,49 @@
 (setq *CCP_BASE_PATH* nil)
 (setq *CCP_INITIALIZED* nil)
 
-;;; Función: CCP-load-com Vlisp
+;;; Función: CCP-fboundp-early
+;;; Verifica si una función existe (versión temprana antes de cargar core.lsp)
+;;; NO usa fboundp directamente para evitar errores en ZWCAD
+(defun CCP-fboundp-early (func-name / result)
+  (vl-catch-all-apply
+    '(lambda ()
+       ;; Intentar evaluar el símbolo
+       (setq result (eval func-name))
+       ;; Si es una función o subr, existe
+       (if (or (functionp result) (subrp result))
+         T
+         ;; Si no, verificar si puede ser llamada
+         (progn
+           (vl-catch-all-apply '(lambda () (apply func-name nil)))
+           T
+         )
+       )
+     )
+  )
+  ;; Si hubo error al evaluar, la función no existe
+  (if (vl-catch-all-error-p 
+        (vl-catch-all-apply '(lambda () (eval func-name))))
+    nil
+    T
+  )
+)
+
+;;; Función: CCP-load-vlisp
 ;;; Carga VLISP si está disponible (AutoCAD) o usa alternativas (ZWCAD)
 (defun CCP-load-vlisp ()
-  (if (not (fboundp 'vl-filename-directory))
+  (if (not (CCP-fboundp-early 'vl-filename-directory))
     (progn
       ;; Intentar cargar vlisp en AutoCAD
       (if (findfile "vlisp.fas")
         (load "vlisp.fas")
-      )
-      ;; Si aún no hay funciones vl, usar alternativas
-      (if (not (fboundp 'vl-filename-directory))
-        (progn
-          ;; Definir alternativas para ZWCAD sin vlisp
-          (defun ccp-strlen (str) (strlen str))
-          (defun ccp-subst-filename (old new str)
-            (vl-string-subst new old str)
-          )
-        )
       )
     )
   )
   T
 )
 
-;;; Función: CCP-get-base-path
-;;; Obtiene la ruta base del sistema desde el archivo loader actual
-(defun CCP_get-base-path (/ path dir)
-  (if *CCP_BASE_PATH*
-    *CCP_BASE_PATH*
-    (progn
-      ;; Método 1: Usar variable *LOADING* (disponible en AutoCAD y ZWCAD)
-      (if (and (boundp '*LOADING*) *LOADING*)
-        (setq path *LOADING*)
-      )
-      
-      ;; Método 2: Buscar archivo loader.lsp
-      (if (or (null path) (= path ""))
-        (setq path (findfile "loader.lsp"))
-      )
-      
-      ;; Método 3: Usar DWGPREFIX como fallback
-      (if (or (null path) (= path ""))
-        (setq path (strcat (getvar "DWGPREFIX") "loader.lsp"))
-      )
-      
-      ;; Extraer directorio del path
-      (if path
-        (progn
-          ;; Normalizar slashes
-          (setq path (vl-string-translate "\\" "/" path))
-          ;; Encontrar último slash
-          (setq dir "")
-          (while (vl-string-search "/" path)
-            (setq dir (strcat dir (substr path 1 (+ (vl-string-search "/" path) 1))))
-            (setq path (substr path (+ (vl-string-search "/" path) 2)))
-          )
-          (setq *CCP_BASE_PATH* 
-            (vl-string-translate "/" "\\" (substr dir 1 (1- (strlen dir))))
-          )
-        )
-        (setq *CCP_BASE_PATH* ".")
-      )
-      
-      *CCP_BASE_PATH*
-    )
-  )
-)
-
 ;;; Función: CCP_get-loader-path
-;;; Obtiene la ruta completa del archivo loader.lsp
+;;; Obtiene la ruta completa del archivo loader.lsp (compatible ZWCAD/AutoCAD)
 (defun CCP_get-loader-path (/ path)
   (cond
     ;; Método 1: Usar *LOADING* si está disponible
@@ -175,6 +148,7 @@
   (CCP_load-file (strcat *CCP_BASE_PATH* "\\lib\\dcl-helpers.lsp"))
   (CCP_load-file (strcat *CCP_BASE_PATH* "\\lib\\dwg-tools.lsp"))
   (CCP_load-file (strcat *CCP_BASE_PATH* "\\lib\\rne-constants.lsp"))
+  (CCP_load-file (strcat *CCP_BASE_PATH* "\\lib\\logging.lsp"))
   
   (princ "\n[LOADER] Librerías cargadas.")
 )
@@ -233,12 +207,12 @@
   (CCP_load-modules)
   
   ;; Inicializar registry
-  (if (fboundp 'CCP_initialize-registry)
+  (if (CCP-fboundp-early 'CCP_initialize-registry)
     (CCP_initialize-registry)
   )
   
   ;; Inicializar logging
-  (if (fboundp 'CCP_init-logging)
+  (if (CCP-fboundp-early 'CCP_init-logging)
     (CCP_init-logging)
   )
   
@@ -251,7 +225,7 @@
 )
 
 ;;; Función: CCP_validate-installation
-;;; Valida que la instalación sea correcta
+;;; Valida que la instalación sea correcta (compatible ZWCAD/AutoCAD)
 (defun CCP_validate-installation (/ errors)
   (setq errors nil)
   
@@ -263,12 +237,12 @@
   )
   
   ;; Verificar core
-  (if (not (fboundp 'CCP_run-module))
+  (if (not (CCP-fboundp-early 'CCP_run-module))
     (setq errors (append errors '("Dispatcher no disponible")))
   )
   
   ;; Verificar registry
-  (if (not (fboundp 'CCP-get-module))
+  (if (not (CCP-fboundp-early 'CCP-get-module))
     (setq errors (append errors '("Registry no disponible")))
   )
   

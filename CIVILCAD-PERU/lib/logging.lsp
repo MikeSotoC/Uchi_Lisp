@@ -58,8 +58,8 @@
 ;;; Obtiene timestamp formateado para logs (compatible AutoCAD/ZWCAD)
 (defun CCP-get-timestamp-string ()
   (cond
-    ;; Método 1: Usar menucmd (AutoCAD)
-    ((fboundp 'menucmd)
+    ;; Método 1: Usar menucmd si está disponible (AutoCAD)
+    ((CCP-fboundp-safe 'menucmd)
       (menucmd "M=$(edtime,$(getvar,date),YYYY-MM-DD HH:MM:SS)")
     )
     ;; Método 2: Usar rtos con CDATE (ZWCAD/AutoCAD)
