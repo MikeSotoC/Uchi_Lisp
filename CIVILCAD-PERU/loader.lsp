@@ -10,32 +10,93 @@
 (setq *CCP_INITIALIZED* nil)
 
 ;;; Función: CCP_get-base-path
-;;; Obtiene la ruta base del sistema
+;;; Obtiene la ruta base del sistema desde el archivo loader actual
 (defun CCP_get-base-path ()
   (if *CCP_BASE_PATH*
     *CCP_BASE_PATH*
     (setq *CCP_BASE_PATH*
       (vl-filename-directory
-        (vl-filename-mkfullpath
-          (getvar "MENUNAME")
-          "CIVILCAD-PERU"
-          "loader.lsp"
+        (vl-string-translate "/" "\\"
+          (rtos (getvar "MENUNAME") 2 0) ; Fallback inicial
         )
       )
     )
+    ;; Si falla el método anterior, usar *LOADING* o path relativo
+    (if (or (null *CCP_BASE_PATH*) (= *CCP_BASE_PATH* ""))
+      (setq *CCP_BASE_PATH*
+        (vl-filename-directory
+          (cond
+            ((and (boundp '*LOADING*) *LOADING*) *LOADING*)
+            ((findfile "loader.lsp") (findfile "loader.lsp"))
+            (t (getvar "LASTSAVEDFILE"))
+          )
+        )
+      )
+    )
+    ;; Normalizar path (eliminar nombre de archivo, dejar solo directorio)
+    (if (and *CCP_BASE_PATH* 
+             (not (wcmatch *CCP_BASE_PATH* "*\\\\$")))
+      (setq *CCP_BASE_PATH* 
+        (vl-filename-directory 
+          (strcat *CCP_BASE_PATH* "\\dummy.lsp")
+        )
+      )
+    )
+    *CCP_BASE_PATH*
+  )
+)
+
+;;; Función: CCP_get-loader-path
+;;; Obtiene la ruta completa del archivo loader.lsp
+(defun CCP_get-loader-path (/ path)
+  (cond
+    ;; Método 1: Usar vl-system-registry (si está disponible)
+    ((and (fboundp 'vlax-get-acad-object) 
+          (setq acadObj (vlax-get-acad-object)))
+     (setq path (vl-filename-directory 
+                  (vl-string-translate "/" "\\" 
+                    (vl-filename-base (vl-filename-directory (vl-princ-to-string (vlax-get-property acadObj 'FullName))))
+                  )
+                )
+     )
+    )
+    ;; Método 2: Buscar en search path
+    ((findfile "loader.lsp")
+     (vl-filename-directory (findfile "loader.lsp"))
+    )
+    ;; Método 3: Usar directorio actual
+    (t (getvar "DWGPREFIX"))
   )
 )
 
 ;;; Función: CCP_setup-paths
 ;;; Configura todas las rutas del sistema
 (defun CCP_setup-paths ()
-  (setq *CCP_BASE_PATH* (CCP_get-base-path))
+  ;; Obtener ruta base usando método robusto
+  (setq *CCP_BASE_PATH* (CCP_get-loader-path))
   
-  ;; Agregar rutas al search path de AutoCAD
-  (foreach subdir '("core" "lib" "modules" "config" "resources")
+  ;; Verificar que la ruta existe
+  (if (not (findfile *CCP_BASE_PATH*))
+    (progn
+      (princ "\n[LOADER] ERROR: No se pudo determinar la ruta base.")
+      (princ "\n[LOADER] Por favor, cargue el sistema desde APPLOAD con la ruta completa.")
+      (exit)
+    )
+  )
+  
+  (princ (strcat "\n[LOADER] Ruta base: " *CCP_BASE_PATH*))
+  
+  ;; Agregar subdirectorios al support path de AutoCAD
+  (foreach subdir '("core" "lib" "modules" "config" "resources" "modules/topografia" "modules/carreteras" "modules/saneamiento" "modules/estructuras" "modules/reportes")
     (setq fullpath (strcat *CCP_BASE_PATH* "\\" subdir))
     (if (findfile fullpath)
-      (load (strcat fullpath "\\acad.fas") (strcat fullpath "\\*.fas"))
+      (progn
+        ;; Agregar al support path temporalmente para esta sesión
+        (setq existing-path (getvar "SUPPORTPATH"))
+        (if (not (wcmatch existing-path (strcat "*" fullpath "*")))
+          (setvar "SUPPORTPATH" (strcat existing-path ";" fullpath))
+        )
+      )
     )
   )
   (princ "\n[LOADER] Rutas configuradas correctamente.")
