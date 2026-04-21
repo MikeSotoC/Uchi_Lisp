@@ -75,29 +75,28 @@
   )
 )
 
-(defun uchi:launcher-valid-p (/ f d fname app-core)
+(defun uchi:launcher-valid-p (/ f d fname app-core parent-dir)
   (setq f (uchi:launcher-file))
   (setq d (uchi:launcher-dir))
   (setq fname (if f (vl-filename-base f) ""))
   (setq app-core (if d (strcat d "/app/uchi_core.lsp") nil))
+  (setq parent-dir (if d (vl-filename-directory d) nil))
   
-  ;; Debug logging
-  ;(uchi:log (strcat "DEBUG: f=" (if f f "nil") " d=" (if d d "nil") " fname=" fname))
+  ;; Logging detallado para debug
+  (uchi:log (strcat "DEBUG: f=" (if f f "nil")))
+  (uchi:log (strcat "DEBUG: d=" (if d d "nil")))
+  (uchi:log (strcat "DEBUG: fname=" fname))
+  (uchi:log (strcat "DEBUG: app-core exists=" (if (findfile app-core) "YES" "NO")))
   
+  ;; Validación simplificada y robusta
   (and f
        d
+       ;; Verificar que el archivo se llame main.lsp (case-insensitive)
        (= (strcase fname) "MAIN.LSP")
-       (not (wcmatch (strcase d) "*/*/APP"))
-       (not (wcmatch (strcase d) "*/APP"))
-       (or 
-           ;; Verifica que exista app/uchi_core.lsp relativo al launcher
-           (findfile app-core)
-           ;; O patrones comunes en el nombre de la carpeta padre
-           (wcmatch (strcase d) "*UCHI*")
-           (wcmatch (strcase d) "*LISP*")
-           (wcmatch (strcase d) "*PROYECTO*")
-           (wcmatch (strcase d) "*DESKTOP*")
-       )
+       ;; Verificar que NO esté dentro de una carpeta llamada "app"
+       (not (wcmatch (strcase (vl-filename-base d)) "APP"))
+       ;; Verificar que exista app/uchi_core.lsp relativo al launcher
+       (findfile app-core)
   )
 )
 
