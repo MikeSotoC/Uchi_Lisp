@@ -76,21 +76,45 @@
 )
 
 (defun uchi:launcher-valid-p (/ f d fname app-core parent-dir)
+  ;; Obtener ruta del archivo launcher
   (setq f (uchi:launcher-file))
-  (setq d (uchi:launcher-dir))
-  (setq fname (if f (vl-filename-base f) ""))
-  (setq app-core (if d (strcat d "/app/uchi_core.lsp") nil))
-  (setq parent-dir (if d (vl-filename-directory d) nil))
+  
+  ;; Si no hay archivo, fallar inmediatamente
+  (if (not f)
+    (progn
+      (uchi:log "DEBUG: No se pudo determinar el archivo launcher (f=nil)")
+      (return-from uchi:launcher-valid-p nil)
+    )
+  )
+  
+  ;; Obtener directorio
+  (setq d (vl-filename-directory (uchi:path-normalize f)))
+  
+  ;; Si no hay directorio, fallar
+  (if (not d)
+    (progn
+      (uchi:log (strcat "DEBUG: No se pudo determinar el directorio desde: " f))
+      (return-from uchi:launcher-valid-p nil)
+    )
+  )
+  
+  ;; Extraer nombre del archivo de forma segura
+  (setq fname (vl-filename-base f))
+  (if (not fname)
+    (setq fname "")
+  )
+  
+  ;; Construir ruta al core
+  (setq app-core (strcat d "/app/uchi_core.lsp"))
   
   ;; Logging detallado para debug
-  (uchi:log (strcat "DEBUG: f=" (if f f "nil")))
-  (uchi:log (strcat "DEBUG: d=" (if d d "nil")))
+  (uchi:log (strcat "DEBUG: f=" f))
+  (uchi:log (strcat "DEBUG: d=" d))
   (uchi:log (strcat "DEBUG: fname=" fname))
   (uchi:log (strcat "DEBUG: app-core exists=" (if (findfile app-core) "YES" "NO")))
   
   ;; Validación simplificada y robusta
-  (and f
-       d
+  (and
        ;; Verificar que el archivo se llame main.lsp (case-insensitive)
        (= (strcase fname) "MAIN.LSP")
        ;; Verificar que NO esté dentro de una carpeta llamada "app"
