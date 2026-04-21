@@ -74,13 +74,19 @@
   )
 )
 
-(defun uchi:launcher-valid-p (/ f d)
+(defun uchi:launcher-valid-p (/ f d fname)
   (setq f (uchi:launcher-file))
   (setq d (uchi:launcher-dir))
+  (setq fname (if f (vl-filename-base f) ""))
   (and f
        d
-       (= (strcase (strcat (vl-filename-base f) "." (vl-filename-extension f))) (strcase *uchi-launcher-name*))
+       (= (strcase fname) "MAIN")
+       (not (wcmatch (strcase d) "*/*/APP"))
        (not (wcmatch (strcase d) "*/APP"))
+       (or (wcmatch (strcase d) "*UCHI*")
+           (wcmatch (strcase d) "*LISP*")
+           (wcmatch (strcase d) "*PROYECTO*")
+           (findfile (strcat d "/app/uchi_core.lsp")))
   )
 )
 
