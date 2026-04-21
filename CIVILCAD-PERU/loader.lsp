@@ -63,7 +63,13 @@
      (vl-filename-directory (findfile "loader.lsp"))
     )
     ;; Método 3: Usar directorio actual
-    (t (getvar "DWGPREFIX"))
+    (t 
+      (setq path (getvar "DWGPREFIX"))
+      (if (or (null path) (= path ""))
+        "."
+        path
+      )
+    )
   )
 )
 
@@ -108,20 +114,21 @@
 (defun CCP_load-file (filepath / result)
   (if (findfile filepath)
     (progn
-      (setq result (load filepath))
-      (if result
+      (setq result (vl-catch-all-apply '(lambda () (load filepath))))
+      (if (not (vl-catch-all-error-p result))
         (progn
           (princ (strcat "\n[LOADER] Cargado: " filepath))
           T
         )
         (progn
-          (princ (strcat "\n[LOADER] ERROR cargando: " filepath))
+          (princ (strcat "\n[LOADER] ERROR cargando: " filepath " - " (vl-catch-all-error-msg result)))
           nil
         )
       )
     )
     (progn
-      (princ (strcat "\n[LOADER] Archivo no encontrado: " filepath))
+      ;; Archivo no encontrado, continuar sin error fatal
+      (princ (strcat "\n[LOADER] Info: Archivo no encontrado: " filepath))
       nil
     )
   )
@@ -206,9 +213,18 @@
   (CCP_load-core)
   (CCP_load-modules)
   
-  ;; Inicializar registry
-  (if (CCP-fboundp-early 'CCP_initialize-registry)
-    (CCP_initialize-registry)
+  ;; Inicializar registry - verificar si existe la función
+  (if (and (boundp '*CCP_MODULE_REGISTRY*) 
+           (not (null *CCP_MODULE_REGISTRY*)))
+    (progn
+      (princ "\n[LOADER] Registry ya inicializado.")
+    )
+    (progn
+      (if (CCP-fboundp-early 'CCP_initialize-registry)
+        (CCP_initialize-registry)
+        (princ "\n[LOADER] ADVERTENCIA: CCP_initialize-registry no disponible, usando fallback.")
+      )
+    )
   )
   
   ;; Inicializar logging

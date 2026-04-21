@@ -7,6 +7,67 @@
 (setq *CCP_CORE_VERSION* "1.0.0")
 (setq *CCP_DEBUG_MODE* nil)
 
+;;; Función: vl-prin1-to-string-safe
+;;; Fallback seguro para vl-prin1-to-string (compatible ZWCAD/AutoCAD)
+(defun vl-prin1-to-string-safe (obj / result str-result)
+  ;; Intentar usar vl-prin1-to-string si está disponible
+  (if (boundp 'vl-prin1-to-string)
+    (progn
+      (setq result (vl-catch-all-apply '(lambda () (vl-prin1-to-string obj))))
+      (if (or (null result) (vl-catch-all-error-p result))
+        ;; Si falla, usar fallbacks
+        (cond
+          ((stringp obj) obj)
+          ((numberp obj) (rtos obj 2 4))
+          ((symbolp obj) (vl-symbol-name-safe obj))
+          ((listp obj) (vl-list->string-safe obj))
+          (t (princ-to-string obj))
+        )
+        result
+      )
+    )
+    ;; vl-prin1-to-string no disponible, usar fallbacks directos
+    (cond
+      ((stringp obj) obj)
+      ((numberp obj) (rtos obj 2 4))
+      ((symbolp obj) (vl-symbol-name-safe obj))
+      ((listp obj) (vl-list->string-safe obj))
+      (t (princ-to-string obj))
+    )
+  )
+)
+
+;;; Función: vl-symbol-name-safe
+;;; Fallback seguro para vl-symbol-name
+(defun vl-symbol-name-safe (sym / result)
+  (if (boundp 'vl-symbol-name)
+    (progn
+      (setq result (vl-catch-all-apply '(lambda () (vl-symbol-name sym))))
+      (if (or (null result) (vl-catch-all-error-p result))
+        (princ-to-string sym)
+        result
+      )
+    )
+    (princ-to-string sym)
+  )
+)
+
+;;; Función: vl-list->string-safe
+;;; Fallback seguro para vl-list->string
+(defun vl-list->string-safe (lst / result str)
+  (if (boundp 'vl-list->string)
+    (progn
+      (setq result (vl-catch-all-apply '(lambda () (vl-list->string lst))))
+      (if (or (null result) (vl-catch-all-error-p result))
+        ;; Fallback: convertir lista a string manualmente
+        (princ-to-string lst)
+        result
+      )
+    )
+    (princ-to-string lst)
+  )
+)
+
 ;;; Función: CCP-fboundp-safe
 ;;; Verifica si una función existe (compatible ZWCAD/AutoCAD)
 ;;; Esta función NO usa fboundp directamente para evitar errores en ZWCAD
@@ -50,7 +111,7 @@
   (if (CCP-fboundp-safe func-name)
     (vl-catch-all-apply '(lambda () (apply func-name nil)))
     (progn
-      (princ (strcat "\n[CORE] Función no encontrada: " (vl-prin1-to-string func-name)))
+      (princ (strcat "\n[CORE] Función no encontrada: " (vl-prin1-to-string-safe func-name)))
       nil
     )
   )
@@ -85,7 +146,7 @@
       (setvar "AUPREC" 4)
     )
   )
-  (princ (strcat "\n[CORE] Unidades configuradas: " (vl-prin1-to-string unit-type)))
+  (princ (strcat "\n[CORE] Unidades configuradas: " (vl-prin1-to-string-safe unit-type)))
 )
 
 ;;; Función: CCP-start-undo
@@ -117,7 +178,7 @@
 (defun CCP-create-layer (layer-name color linetype / )
   (if (not (CCP-layer-exists layer-name))
     (progn
-      (command "_.LAYER" "_Make" layer-name "_Color" (vl-prin1-to-string color) "" "")
+      (command "_.LAYER" "_Make" layer-name "_Color" (vl-prin1-to-string-safe color) "" "")
       (if (and linetype (not (tblsearch "LTYPE" linetype)))
         (command "_.LINETYPE" "_Load" linetype "acad.lin" "")
       )

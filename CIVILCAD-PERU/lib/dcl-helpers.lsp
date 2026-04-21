@@ -52,7 +52,7 @@
 ;;; Establece valor en un tile del diálogo
 (defun CCP-set-tile-value (key value)
   (mode_tile key 0)  ;; Habilitar
-  (set_tile key (vl-prin1-to-string value))
+  (set_tile key (vl-prin1-to-string-safe value))
 )
 
 ;;; Función: CCP-get-tile-value
@@ -144,7 +144,7 @@
 ;;; Función: CCP-set-radio-group
 ;;; Establece selección en grupo de radio buttons
 (defun CCP-set-radio-group (key value)
-  (set_tile key (vl-prin1-to-string value))
+  (set_tile key (vl-prin1-to-string-safe value))
 )
 
 ;;; Función: CCP-get-radio-group

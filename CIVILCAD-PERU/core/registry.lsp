@@ -84,7 +84,7 @@
   (foreach mod *CCP_MODULE_REGISTRY*
     (princ (strcat "\n  [" (cdr (assoc 'key mod)) "] " (cdr (assoc 'name mod))))
     (princ (strcat "\n      Categoría: " (cdr (assoc 'category mod))))
-    (princ (strcat "\n      Estado: " (vl-prin1-to-string (cdr (assoc 'status mod)))))
+    (princ (strcat "\n      Estado: " (vl-prin1-to-string-safe (cdr (assoc 'status mod)))))
     (princ (strcat "\n      Descripción: " (cdr (assoc 'description mod))))
   )
   (princ "\n==========================\n")
@@ -186,7 +186,7 @@
     "reportes"
   )
   
-  (princ (strcat "\n[REGISTRY] " (vl-prin1-to-string (CCP-get-module-count)) " módulos registrados."))
+  (princ (strcat "\n[REGISTRY] " (itoa (CCP-get-module-count)) " módulos registrados."))
   *CCP_MODULE_REGISTRY*
 )
 

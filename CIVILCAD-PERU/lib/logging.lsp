@@ -242,11 +242,11 @@
   (if (assoc level *CCP_LOG_LEVELS*)
     (progn
       (setq *CCP_LOG_LEVEL* level)
-      (princ (strcat "\n[LOGGING] Nivel establecido: " (vl-prin1-to-string level)))
+      (princ (strcat "\n[LOGGING] Nivel establecido: " (vl-prin1-to-string-safe level)))
       T
     )
     (progn
-      (princ (strcat "\n[LOGGING] Nivel inválido: " (vl-prin1-to-string level)))
+      (princ (strcat "\n[LOGGING] Nivel inválido: " (vl-prin1-to-string-safe level)))
       nil
     )
   )

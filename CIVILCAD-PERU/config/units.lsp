@@ -68,7 +68,7 @@
     )
     (progn
       (princ (strcat "\n[UNITS] Sistema no encontrado: " 
-                     (vl-prin1-to-string system-key)))
+                     (vl-prin1-to-string-safe system-key)))
       nil
     )
   )
@@ -129,7 +129,7 @@
 (defun CCP-list-unit-systems ()
   (princ "\n\n=== SISTEMAS DE UNIDADES ===\n")
   (foreach sys *CCP_UNIT_SYSTEMS*
-    (princ (strcat "\n  " (vl-prin1-to-string (car sys)) ": " 
+    (princ (strcat "\n  " (vl-prin1-to-string-safe (car sys)) ": " 
                    (cdr (assoc 'name (cdr sys)))))
   )
   (princ "\n==========================\n")

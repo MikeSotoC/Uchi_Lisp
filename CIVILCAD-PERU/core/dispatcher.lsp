@@ -143,16 +143,16 @@
       (setq result (vl-catch-all-apply func-name args))
       (if (vl-catch-all-error-p result)
         (progn
-          (princ (strcat "\n[DISPATCHER] Error ejecutando " (vl-prin1-to-string func-name) ": "))
+          (princ (strcat "\n[DISPATCHER] Error ejecutando " (vl-prin1-to-string-safe func-name) ": "))
           (princ (vl-catch-all-error-message result))
-          (CCP-log-event "error" (strcat "Error en " (vl-prin1-to-string func-name) ": " (vl-catch-all-error-message result)))
+          (CCP-log-event "error" (strcat "Error en " (vl-prin1-to-string-safe func-name) ": " (vl-catch-all-error-message result)))
           nil
         )
         result
       )
     )
     (progn
-      (princ (strcat "\n[DISPATCHER] Función no encontrada: " (vl-prin1-to-string func-name)))
+      (princ (strcat "\n[DISPATCHER] Función no encontrada: " (vl-prin1-to-string-safe func-name)))
       nil
     )
   )
