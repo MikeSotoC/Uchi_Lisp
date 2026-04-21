@@ -55,9 +55,29 @@
 )
 
 ;;; Función: CCP-get-timestamp-string
-;;; Obtiene timestamp formateado para logs
+;;; Obtiene timestamp formateado para logs (compatible AutoCAD/ZWCAD)
 (defun CCP-get-timestamp-string ()
-  (menucmd "M=$(edtime,$(getvar,date),YYYY-MM-DD HH:MM:SS)")
+  (cond
+    ;; Método 1: Usar menucmd (AutoCAD)
+    ((fboundp 'menucmd)
+      (menucmd "M=$(edtime,$(getvar,date),YYYY-MM-DD HH:MM:SS)")
+    )
+    ;; Método 2: Usar rtos con CDATE (ZWCAD/AutoCAD)
+    (T
+      (setq cdate-val (getvar "CDATE"))
+      (if cdate-val
+        (strcat
+          (rtos (fix (/ cdate-val 10000)) 2 0) "-"  ; Año
+          (rtos (fix (/ (rem cdate-val 10000) 100)) 2 0) "-"  ; Mes
+          (rtos (fix (rem cdate-val 100)) 2 0) " "  ; Día
+          (rtos (fix (/ (rem cdate-val 1) 10000)) 2 0) ":"  ; Hora
+          (rtos (fix (rem (/ (rem cdate-val 1) 100) 100)) 2 0) ":"  ; Minutos
+          (rtos (fix (rem (rem cdate-val 1) 100)) 2 0)  ; Segundos
+        )
+        "0000-00-00 00:00:00"
+      )
+    )
+  )
 )
 
 ;;; Función: CCP-log-level-ok
@@ -78,15 +98,26 @@
 )
 
 ;;; Función: CCP-log-event
-;;; Registra un evento en el log
-(defun CCP-log-event (level message / log-line timestamp)
+;;; Registra un evento en el log (compatible AutoCAD/ZWCAD)
+(defun CCP-log-event (level message / log-line timestamp level-str)
   (if (not (CCP-log-level-ok level))
     nil
     (progn
       (setq timestamp (CCP-get-timestamp-string))
+      ;; Obtener string del nivel de forma segura
+      (setq level-str 
+        (cond
+          ((= level 'debug) "DEBUG")
+          ((= level 'info) "INFO")
+          ((= level 'warning) "WARNING")
+          ((= level 'error) "ERROR")
+          ((= level 'fatal) "FATAL")
+          (T "INFO")
+        )
+      )
       (setq log-line (strcat 
         "[" timestamp "] "
-        "[" (vl-prin1-to-string (car (assoc level *CCP_LOG_LEVELS*)))] " "
+        "[" level-str "] "
         (if *CCP_CURRENT_MODULE*
           (strcat "[" *CCP_CURRENT_MODULE* "] ")
           ""
@@ -104,7 +135,7 @@
           
           ;; También mostrar en consola si es warning o error
           (if (or (= level 'warning) (= level 'error) (= level 'fatal))
-            (princ (strcat "\n[" (vl-prin1-to-string level) "] " message))
+            (princ (strcat "\n[" level-str "] " message))
           )
           
           T

@@ -1,6 +1,6 @@
 ;;; ============================================================================
 ;;; CIVILCAD-PERÚ - LOADER PRINCIPAL
-;;; Sistema de Ingeniería Civil para AutoCAD
+;;; Sistema de Ingeniería Civil para AutoCAD y ZWCAD
 ;;; Versión: 1.0.0
 ;;; ============================================================================
 
@@ -9,40 +9,71 @@
 (setq *CCP_BASE_PATH* nil)
 (setq *CCP_INITIALIZED* nil)
 
-;;; Función: CCP_get-base-path
-;;; Obtiene la ruta base del sistema desde el archivo loader actual
-(defun CCP_get-base-path ()
-  (if *CCP_BASE_PATH*
-    *CCP_BASE_PATH*
-    (setq *CCP_BASE_PATH*
-      (vl-filename-directory
-        (vl-string-translate "/" "\\"
-          (rtos (getvar "MENUNAME") 2 0) ; Fallback inicial
-        )
+;;; Función: CCP-load-com Vlisp
+;;; Carga VLISP si está disponible (AutoCAD) o usa alternativas (ZWCAD)
+(defun CCP-load-vlisp ()
+  (if (not (fboundp 'vl-filename-directory))
+    (progn
+      ;; Intentar cargar vlisp en AutoCAD
+      (if (findfile "vlisp.fas")
+        (load "vlisp.fas")
       )
-    )
-    ;; Si falla el método anterior, usar *LOADING* o path relativo
-    (if (or (null *CCP_BASE_PATH*) (= *CCP_BASE_PATH* ""))
-      (setq *CCP_BASE_PATH*
-        (vl-filename-directory
-          (cond
-            ((and (boundp '*LOADING*) *LOADING*) *LOADING*)
-            ((findfile "loader.lsp") (findfile "loader.lsp"))
-            (t (getvar "LASTSAVEDFILE"))
+      ;; Si aún no hay funciones vl, usar alternativas
+      (if (not (fboundp 'vl-filename-directory))
+        (progn
+          ;; Definir alternativas para ZWCAD sin vlisp
+          (defun ccp-strlen (str) (strlen str))
+          (defun ccp-subst-filename (old new str)
+            (vl-string-subst new old str)
           )
         )
       )
     )
-    ;; Normalizar path (eliminar nombre de archivo, dejar solo directorio)
-    (if (and *CCP_BASE_PATH* 
-             (not (wcmatch *CCP_BASE_PATH* "*\\\\$")))
-      (setq *CCP_BASE_PATH* 
-        (vl-filename-directory 
-          (strcat *CCP_BASE_PATH* "\\dummy.lsp")
-        )
-      )
-    )
+  )
+  T
+)
+
+;;; Función: CCP-get-base-path
+;;; Obtiene la ruta base del sistema desde el archivo loader actual
+(defun CCP_get-base-path (/ path dir)
+  (if *CCP_BASE_PATH*
     *CCP_BASE_PATH*
+    (progn
+      ;; Método 1: Usar variable *LOADING* (disponible en AutoCAD y ZWCAD)
+      (if (and (boundp '*LOADING*) *LOADING*)
+        (setq path *LOADING*)
+      )
+      
+      ;; Método 2: Buscar archivo loader.lsp
+      (if (or (null path) (= path ""))
+        (setq path (findfile "loader.lsp"))
+      )
+      
+      ;; Método 3: Usar DWGPREFIX como fallback
+      (if (or (null path) (= path ""))
+        (setq path (strcat (getvar "DWGPREFIX") "loader.lsp"))
+      )
+      
+      ;; Extraer directorio del path
+      (if path
+        (progn
+          ;; Normalizar slashes
+          (setq path (vl-string-translate "\\" "/" path))
+          ;; Encontrar último slash
+          (setq dir "")
+          (while (vl-string-search "/" path)
+            (setq dir (strcat dir (substr path 1 (+ (vl-string-search "/" path) 1))))
+            (setq path (substr path (+ (vl-string-search "/" path) 2)))
+          )
+          (setq *CCP_BASE_PATH* 
+            (vl-string-translate "/" "\\" (substr dir 1 (1- (strlen dir))))
+          )
+        )
+        (setq *CCP_BASE_PATH* ".")
+      )
+      
+      *CCP_BASE_PATH*
+    )
   )
 )
 
@@ -50,15 +81,9 @@
 ;;; Obtiene la ruta completa del archivo loader.lsp
 (defun CCP_get-loader-path (/ path)
   (cond
-    ;; Método 1: Usar vl-system-registry (si está disponible)
-    ((and (fboundp 'vlax-get-acad-object) 
-          (setq acadObj (vlax-get-acad-object)))
-     (setq path (vl-filename-directory 
-                  (vl-string-translate "/" "\\" 
-                    (vl-filename-base (vl-filename-directory (vl-princ-to-string (vlax-get-property acadObj 'FullName))))
-                  )
-                )
-     )
+    ;; Método 1: Usar *LOADING* si está disponible
+    ((and (boundp '*LOADING*) *LOADING*)
+     (vl-filename-directory *LOADING*)
     )
     ;; Método 2: Buscar en search path
     ((findfile "loader.lsp")
@@ -70,31 +95,34 @@
 )
 
 ;;; Función: CCP_setup-paths
-;;; Configura todas las rutas del sistema
+;;; Configura todas las rutas del sistema (compatible AutoCAD/ZWCAD)
 (defun CCP_setup-paths ()
   ;; Obtener ruta base usando método robusto
   (setq *CCP_BASE_PATH* (CCP_get-loader-path))
   
   ;; Verificar que la ruta existe
-  (if (not (findfile *CCP_BASE_PATH*))
+  (if (or (null *CCP_BASE_PATH*) (= *CCP_BASE_PATH* "") (= *CCP_BASE_PATH* "."))
     (progn
-      (princ "\n[LOADER] ERROR: No se pudo determinar la ruta base.")
-      (princ "\n[LOADER] Por favor, cargue el sistema desde APPLOAD con la ruta completa.")
-      (exit)
+      (princ "\n[LOADER] ADVERTENCIA: Usando directorio actual como ruta base.")
+      (setq *CCP_BASE_PATH* (getvar "DWGPREFIX"))
     )
   )
   
   (princ (strcat "\n[LOADER] Ruta base: " *CCP_BASE_PATH*))
   
-  ;; Agregar subdirectorios al support path de AutoCAD
+  ;; Agregar subdirectorios al support path (AutoCAD/ZWCAD)
   (foreach subdir '("core" "lib" "modules" "config" "resources" "modules/topografia" "modules/carreteras" "modules/saneamiento" "modules/estructuras" "modules/reportes")
     (setq fullpath (strcat *CCP_BASE_PATH* "\\" subdir))
     (if (findfile fullpath)
       (progn
-        ;; Agregar al support path temporalmente para esta sesión
-        (setq existing-path (getvar "SUPPORTPATH"))
-        (if (not (wcmatch existing-path (strcat "*" fullpath "*")))
-          (setvar "SUPPORTPATH" (strcat existing-path ";" fullpath))
+        ;; Agregar al support path si está disponible
+        (if (getvar "SUPPORTPATH")
+          (progn
+            (setq existing-path (getvar "SUPPORTPATH"))
+            (if (not (wcmatch existing-path (strcat "*" fullpath "*")))
+              (setvar "SUPPORTPATH" (strcat existing-path ";" fullpath))
+            )
+          )
         )
       )
     )
@@ -192,8 +220,11 @@
 (defun CCP_init-system ()
   (princ "\n\n========================================")
   (princ "\nCIVILCAD-PERÚ v1.0.0")
-  (princ "\nSistema de Ingeniería Civil para AutoCAD")
+  (princ "\nSistema de Ingeniería Civil para AutoCAD y ZWCAD")
   (princ "\n========================================\n")
+  
+  ;; Cargar VLISP si es necesario (compatibilidad)
+  (CCP-load-vlisp)
   
   (CCP_setup-paths)
   (CCP_load-config)

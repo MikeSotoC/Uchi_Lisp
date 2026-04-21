@@ -1,6 +1,6 @@
 ;;; ============================================================================
 ;;; CIVILCAD-PERÚ - LAUNCHER UI
-;;; Interfaz principal del sistema
+;;; Interfaz principal del sistema - Compatible con AutoCAD y ZWCAD
 ;;; ============================================================================
 
 (setq *CCP_LAUNCHER_VERSION* "1.0.0")

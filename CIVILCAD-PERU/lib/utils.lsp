@@ -218,9 +218,29 @@
 )
 
 ;;; Función: CCP-get-timestamp
-;;; Obtiene timestamp formateado
+;;; Obtiene timestamp formateado (compatible AutoCAD/ZWCAD)
 (defun CCP-get-timestamp ()
-  (menucmd "M=$(edtime,$(getvar,date),YYYY-MM-DD HH:MM:SS)")
+  (cond
+    ;; Método 1: Usar menucmd (AutoCAD)
+    ((fboundp 'menucmd)
+      (menucmd "M=$(edtime,$(getvar,date),YYYY-MM-DD HH:MM:SS)")
+    )
+    ;; Método 2: Usar rtos con CDATE (ZWCAD/AutoCAD)
+    (T
+      (setq cdate-val (getvar "CDATE"))
+      (if cdate-val
+        (strcat
+          (rtos (fix (/ cdate-val 10000)) 2 0) "-"  ; Año
+          (rtos (fix (/ (rem cdate-val 10000) 100)) 2 0) "-"  ; Mes
+          (rtos (fix (rem cdate-val 100)) 2 0) " "  ; Día
+          (rtos (fix (/ (rem cdate-val 1) 10000)) 2 0) ":"  ; Hora
+          (rtos (fix (rem (/ (rem cdate-val 1) 100) 100)) 2 0) ":"  ; Minutos
+          (rtos (fix (rem (rem cdate-val 1) 100)) 2 0)  ; Segundos
+        )
+        "0000-00-00 00:00:00"
+      )
+    )
+  )
 )
 
 ;;; Función: CCP-random

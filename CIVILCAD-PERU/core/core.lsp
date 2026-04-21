@@ -1,6 +1,6 @@
 ;;; ============================================================================
 ;;; CIVILCAD-PERÚ - CORE SYSTEM
-;;; Núcleo principal del sistema
+;;; Núcleo principal del sistema - Compatible con AutoCAD y ZWCAD
 ;;; ============================================================================
 
 ;;; Variables globales del core
@@ -16,10 +16,10 @@
 )
 
 ;;; Función: CCP-safe-call
-;;; Ejecuta una función con manejo seguro de errores
+;;; Ejecuta una función con manejo seguro de errores (compatible ZWCAD/AutoCAD)
 (defun CCP-safe-call (func-name / result)
   (if (fboundp func-name)
-    (vl-catch-all-apply 'func-name)
+    (vl-catch-all-apply (function (lambda () (apply func-name nil))))
     (progn
       (princ (strcat "\n[CORE] Función no encontrada: " (vl-prin1-to-string func-name)))
       nil
