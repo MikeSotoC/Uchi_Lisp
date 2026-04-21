@@ -1,0 +1,15 @@
+```
+# DCL and LSP specific compiled files
+*.dcl.bak
+*.lsp.bak
+*.dcl~
+*.lsp~
+
+# Backup and temporary files
+*.bak
+*~
+*.tmp
+
+# Log files
+*.log
+```
